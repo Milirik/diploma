@@ -329,7 +329,6 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             else:
                 plSystem.AddSpaceShip(SpaceShip(i["x"], i["y"], i["z"], i["Vx"], i["Vy"], i["Vz"], i["m"], i["R"], i["color"], i["Fl_color"], i["Phi"], i["F_dv"]))
 
-        print('[u]', len(plSystem.planets), hasattr(plSystem, "spaceShip"))
         if(len(plSystem.planets) > 0 and hasattr(plSystem, "spaceShip")):
 
             plSystem.GetMoveEquations()

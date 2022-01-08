@@ -38,6 +38,23 @@ class PlanetSystem():
             self.spaceShip.Draw(axes)
 
     def GetMoveEquations(self):
+        #    Земля                  Луна              Солнце    
+        # R  6371км(3.6)            1738км(1)         696*10^3км(392.4)
+        # m  5.9722*10^24кг(81.5)   7.35*10^22кг(1)   2*10^30кг(27139500)
+        # 
+        # Расстояния
+        # от Земли до солнца = 149 600 000км (389.17)
+        # от Земли до луны = 384 400км (1)
+        #
+        # Скорости
+        # скорость вращения Земли вокруг Солнца = 29.765 км/с
+        # скорость вращения Луны вокруг Земли 1.023 км/с
+        #
+        # t = Tau/omega
+        # omega = 29.765 км/с
+
+        
+
         n = len(self.planets)
         print(n, self.planets)
         _strX = ''
@@ -202,7 +219,7 @@ class Planet():
         # print('x y z', self.x, self.y, self.z)
         # print('Vx Vy Vz', self.Vx, self.Vy, self.Vz)
         # print('planet R', self.R)
-        self.DrawedPlanet = axes.plot(self.x, self.y, self.z, color='red', marker='o', markersize=self.R)[0]
+        self.DrawedPlanet = axes.plot(self.x, self.y, self.z, color=self.color, marker='o', markersize=self.R)[0]
         self.DrawedTrace = axes.plot(self.TraceX, self.TraceY, self.TraceZ, ':')[0]
 
     def ReDraw(self):
@@ -298,6 +315,3 @@ def DrawTheSpace(axes):
     sizestars = np.random.random(nstars)
     for i in range(nstars):
         axes.plot(xstars[i], ystars[i], xstars[i], marker='o', markersize=sizestars[i], color=[brstars[i], brstars[i], brstars[i]])
-
-global t
-
