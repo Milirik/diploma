@@ -109,12 +109,13 @@ class PlanetSystem():
             DVKSI_Sh = sum([
                 (planet.k* (ksi - KSI_Sh)) / (sp.sqrt((ksi - KSI_Sh) ** 2 + (eta - ETA_Sh) ** 2 + (zeta - ZETA_Sh) ** 2) ** 3)
                 for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
-            ]) + F_dv / self.spaceShip.m * sp.cos(Alpha)#*sp.cos(Beta)
+            ]) + F_dv * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2)) #+ F_dv / self.spaceShip.m * sp.cos(Alpha)#*sp.cos(Beta)
 
             DVETA_Sh = sum([
                 (planet.k* (eta - ETA_Sh)) / (sp.sqrt((ksi - KSI_Sh) ** 2 + (eta - ETA_Sh) ** 2 + (zeta - ZETA_Sh) ** 2) ** 3)
                 for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
-            ]) + F_dv / self.spaceShip.m * sp.sin(Alpha)#*sp.cos(Beta)
+            ]) + F_dv * VETA_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  #+ F_dv / self.spaceShip.m * sp.sin(Alpha)#*sp.cos(Beta)
+
             DVZETA_Sh = sum([
                 (planet.k* (zeta - ZETA_Sh)) /  (sp.sqrt((ksi - KSI_Sh) ** 2 + (eta - ETA_Sh) ** 2 + (zeta - ZETA_Sh) ** 2) ** 3)
                 for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
@@ -215,6 +216,13 @@ class SpaceShip():
         self.F_dv = F_max
         self.F_curr = 0
 
+        self.SpaceShipX = self.ksi 
+        self.SpaceShipY = self.eta
+        self.SpaceShipZ = self.zeta
+
+        self.SpaceShipFlameX = self.R * np.array([0, 1])
+        self.SpaceShipFlameY = self.R * np.array([0, 1])
+
         self.TraceKSI = np.array([self.ksi])
         self.TraceETA = np.array([self.eta])
         self.TraceZETA = np.array([self.zeta])
@@ -235,6 +243,7 @@ class SpaceShip():
 
     def Draw(self, axes):
         self.DrawedSpaceShip = axes.plot(self.ksi, self.eta, self.zeta,marker='o',markersize=1, color=self.color)[0]
+        self.DrawedSpaceShipFlame = axes.plot(self.ksi + self.SpaceShipFlameX, self.eta + self.SpaceShipFlameY, self.zeta, color='yellow')[0]
         self.DrawedTrace = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA,':')[0]
 
     def ReDraw(self):
@@ -242,13 +251,16 @@ class SpaceShip():
         self.DrawedSpaceShip.set_data_3d(self.ksi, self.eta, self.zeta)
         self.DrawedTrace.set_data_3d(self.TraceKSI, self.TraceETA,self.TraceZETA)
 
-def Rot2D(KSI,ETA,phi): # не было у меня
+        RotSpaceShipFlameX, RotSpaceShipFlameY = Rot2D(self.ksi, self.eta, self.phi)
+        self.DrawedSpaceShipFlame.set_data_3d(self.ksi + RotSpaceShipFlameX, self.eta + RotSpaceShipFlameY, self.zeta)
+
+def Rot2D(KSI,ETA,phi):
     RotKSI = KSI*np.cos(phi) - ETA*np.sin(phi)
     RotETA = KSI*np.sin(phi) + ETA*np.cos(phi)
     return RotKSI, RotETA
 
 
-def Rot3D(X, Y, Z,phi):
+def Rot3D(X, Y, Z, phi):
     rotateX = np.array([[1, 0, 0, 0], [0, np.cos(phi), np.sin(phi), 0], [0, -np.sin(phi), np.cos(phi), 0], [0, 0, 0, 1]])
     rotateY = np.array([[np.cos(phi), 0, np.sin(phi), 0], [0, 1, 0, 0], [-np.sin(phi), 0, np.cos(phi), 0], [0, 0, 0, 1]])
     rotateZ = np.array([[np.cos(phi), -np.sin(phi), 0, 0], [np.sin(phi), np.cos(phi), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])

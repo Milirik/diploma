@@ -311,7 +311,6 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         
         #     Параметры массы
         dt = float(self.TStep_field.text())
-        K = float(self.K_field.text())
 
         # Было задано до этого
         # F_max = plSystem.spaceShip.F_dv
@@ -351,7 +350,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         # F_dv = 0 # Если убрать то будет норм двигатель работать для ракеты
 
         # ===================== Просчитываем траектории полета и получаем вектора ======================= #
-        if((len(plSystem.planets) > 0 and hasattr(plSystem, "spaceShip")) or true): # Убрать TRUE
+        if((len(plSystem.planets) > 0 and hasattr(plSystem, "spaceShip")) or True): # Убрать TRUE
             plSystem.GetMoveEquations()
             KSI,ETA,ZETA, VKSI, VETA,VZETA = plSystem.GetStateVectors()
             KSI_Sh = plSystem.spaceShip.ksi
@@ -364,7 +363,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
 
         # ====================================== Отрисовка графика ====================================== #
         t = 0.0
-        Side = K*5 # Сторона графика. С помощью нее можно увеличить графики
+        Side = float(self.K_field.text()) # Сторона графика. С помощью нее можно увеличить графики
         self.SpWidget.canvas.axes.clear()
         self.SpWidget.canvas.axes.set(xlim=[-2*Side, 2*Side], ylim=[-Side, Side], zlim=[-Side, Side])
         self.SpWidget.canvas.axes.set_title('Это космос')
