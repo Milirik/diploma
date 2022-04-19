@@ -512,6 +512,15 @@ class Ui_MainWindow(object):
         self.chosenObjectLabel.setFont(font)
         self.chosenObjectLabel.setText("")
         self.chosenObjectLabel.setObjectName("chosenObjectLabel")
+        self.DrawSpaceshipTrajectory = QtWidgets.QPushButton(self.centralwidget)
+        self.DrawSpaceshipTrajectory.setEnabled(True)
+        self.DrawSpaceshipTrajectory.setGeometry(QtCore.QRect(360, 50, 211, 23))
+        self.DrawSpaceshipTrajectory.setObjectName("DrawSpaceshipTrajectory")
+        self.progressBarDrawingSpTr = QtWidgets.QProgressBar(self.centralwidget)
+        self.progressBarDrawingSpTr.setGeometry(QtCore.QRect(580, 50, 191, 21))
+        self.progressBarDrawingSpTr.setProperty("value", 0)
+        self.progressBarDrawingSpTr.setInvertedAppearance(False)
+        self.progressBarDrawingSpTr.setObjectName("progressBarDrawingSpTr")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1400, 21))
@@ -585,6 +594,7 @@ class Ui_MainWindow(object):
         self.label_32.setText(_translate("MainWindow", "Название:"))
         self.label_2.setText(_translate("MainWindow", "Выбран:"))
         self.label_34.setText(_translate("MainWindow", "Выбран:"))
+        self.DrawSpaceshipTrajectory.setText(_translate("MainWindow", "Отрисовка траектории полеты ракеты"))
 from spacewidget import SpaceWidget
 
 

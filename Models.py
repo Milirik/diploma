@@ -14,27 +14,34 @@ class PlanetSystem():
         if spaceShip != 'NotEnoughGold':
             self.spaceShip = spaceShip
 
-    def AddNewPlanet(self, planet):
+    def add_new_planet(self, planet):
         self.planets.append(planet)
 
-    def AddSpaceShip(self, spaceShip):
+    def add_spaceship(self, spaceShip):
         self.spaceShip = spaceShip
 
-    def ReplaceSystem(self, KSI, ETA, ZETA, VKSI, VETA, VZETA, KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, Phi_Sh=0, F_curr=0):
+    def replace_system(self, KSI, ETA, ZETA, VKSI, VETA, VZETA, KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, Phi_Sh=0, F_curr=0):
         for planet, ksi, eta, zeta, vksi, veta, vzeta in zip(self.planets, KSI, ETA, ZETA, VKSI, VETA, VZETA):
-            planet.Replace(ksi, eta, zeta, vksi, veta, vzeta)
-            planet.ReDraw()
+            planet.replace(ksi, eta, zeta, vksi, veta, vzeta)
+            planet.re_draw()
         if (self.spaceShip):
-            self.spaceShip.Replace(KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, Phi_Sh, F_curr)
-            self.spaceShip.ReDraw()
+            self.spaceShip.replace(KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, Phi_Sh, F_curr)
+            self.spaceShip.re_draw()
 
-    def Draw(self, axes):
+    def replace_system_without_draw(self, KSI, ETA, ZETA, VKSI, VETA, VZETA, KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, Phi_Sh=0, F_curr=0):
+        for planet, ksi, eta, zeta, vksi, veta, vzeta in zip(self.planets, KSI, ETA, ZETA, VKSI, VETA, VZETA):
+            planet.replace(ksi, eta, zeta, vksi, veta, vzeta)
+        if (self.spaceShip):
+            self.spaceShip.replace(KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, Phi_Sh, F_curr)
+
+
+    def draw(self, axes):
         for planet in self.planets:
-            planet.Draw(axes)
+            planet.draw(axes)
         if (self.spaceShip):
-            self.spaceShip.Draw(axes)
+            self.spaceShip.draw(axes)
 
-    def GetMoveEquations(self):
+    def get_move_equations(self):
         n = len(self.planets)
         _strKSI = ''
         _strETA = ''
@@ -126,7 +133,7 @@ class PlanetSystem():
             [DKSI_Sh, DETA_Sh, DZETA_Sh, DVKSI_Sh, DVETA_Sh, DVZETA_Sh])
 
 
-    def GetStateVectors(self):
+    def get_state_vectors(self):
         KSI = np.zeros(len(self.planets))
         ETA = np.zeros(len(self.planets))
         ZETA = np.zeros(len(self.planets))
@@ -173,7 +180,7 @@ class Planet():
         self.TraceETA = np.array([self.eta])
         self.TraceZETA = np.array([self.zeta])
 
-    def Replace(self, ksi, eta, zeta, vksi, veta, vzeta):
+    def replace(self, ksi, eta, zeta, vksi, veta, vzeta):
         self.ksi = ksi
         self.eta = eta
         self.zeta = zeta
@@ -185,11 +192,11 @@ class Planet():
         self.TraceETA = np.append(self.TraceETA, eta)
         self.TraceZETA = np.append(self.TraceZETA, zeta)    
 
-    def Draw(self, axes):
+    def draw(self, axes):
         self.DrawedPlanet = axes.plot(self.ksi, self.eta, self.zeta, marker='o',markersize=self.R*50,color=self.color)[0]
         self.DrawedTrace = axes.plot(self.TraceKSI, self.TraceETA,self.TraceZETA, linestyle = 'solid',color=self.color)[0]
 
-    def ReDraw(self):
+    def re_draw(self):
         self.DrawedPlanet.set_data_3d(self.ksi, self.eta,self.zeta)
         self.DrawedTrace.set_data_3d(self.TraceKSI, self.TraceETA,self.TraceZETA)
 
@@ -227,7 +234,7 @@ class SpaceShip():
         self.TraceETA = np.array([self.eta])
         self.TraceZETA = np.array([self.zeta])
 
-    def Replace(self, ksi, eta,zeta, vksi, veta, vzeta, phi, F_curr):
+    def replace(self, ksi, eta,zeta, vksi, veta, vzeta, phi, F_curr):
         self.ksi = ksi
         self.eta = eta
         self.zeta = zeta
@@ -241,26 +248,28 @@ class SpaceShip():
         self.TraceZETA = np.append(self.TraceZETA, zeta)
 
 
-    def Draw(self, axes):
+    def draw(self, axes):
         self.DrawedSpaceShip = axes.plot(self.ksi, self.eta, self.zeta,marker='o',markersize=1, color=self.color)[0]
         self.DrawedSpaceShipFlame = axes.plot(self.ksi + self.SpaceShipFlameX, self.eta + self.SpaceShipFlameY, self.zeta, color='yellow')[0]
         self.DrawedTrace = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA,':')[0]
 
-    def ReDraw(self):
-        #RotSpaceShipKSI, RotSpaceShipETA = Rot2D(self.SpaceShipKSI, self.SpaceShipETA, self.phi)
+    def re_draw(self):
+        #RotSpaceShipKSI, RotSpaceShipETA = rot_2D(self.SpaceShipKSI, self.SpaceShipETA, self.phi)
         self.DrawedSpaceShip.set_data_3d(self.ksi, self.eta, self.zeta)
         self.DrawedTrace.set_data_3d(self.TraceKSI, self.TraceETA,self.TraceZETA)
 
-        RotSpaceShipFlameX, RotSpaceShipFlameY = Rot2D(self.ksi, self.eta, self.phi)
+        RotSpaceShipFlameX, RotSpaceShipFlameY = rot_2D(self.ksi, self.eta, self.phi)
         self.DrawedSpaceShipFlame.set_data_3d(self.ksi + RotSpaceShipFlameX, self.eta + RotSpaceShipFlameY, self.zeta)
 
-def Rot2D(KSI,ETA,phi):
+
+
+def rot_2D(KSI,ETA,phi):
     RotKSI = KSI*np.cos(phi) - ETA*np.sin(phi)
     RotETA = KSI*np.sin(phi) + ETA*np.cos(phi)
     return RotKSI, RotETA
 
 
-def Rot3D(X, Y, Z, phi):
+def rot_3D(X, Y, Z, phi):
     rotateX = np.array([[1, 0, 0, 0], [0, np.cos(phi), np.sin(phi), 0], [0, -np.sin(phi), np.cos(phi), 0], [0, 0, 0, 1]])
     rotateY = np.array([[np.cos(phi), 0, np.sin(phi), 0], [0, 1, 0, 0], [-np.sin(phi), 0, np.cos(phi), 0], [0, 0, 0, 1]])
     rotateZ = np.array([[np.cos(phi), -np.sin(phi), 0, 0], [np.sin(phi), np.cos(phi), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
@@ -274,7 +283,7 @@ def Rot3D(X, Y, Z, phi):
 
     return RotX, RotY, RotZ
 
-def DrawTheSpace(axes):
+def draw_the_space(axes):
     axes.fill([-100, 100, 100, - 100], [-100, - 100, 100, 100], 'black')
     nstars = 5000
     xstars = 200 * np.random.random(nstars) - 100

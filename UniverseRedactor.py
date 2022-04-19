@@ -21,7 +21,6 @@ import FormOfSpaceObjects
 import spacewidget
 
 
-
 class SpaceWidget(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -48,6 +47,8 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         self.createObjectButton.clicked.connect(self.create_new_object)
         self.deleteObjectButton.clicked.connect(self.delete_object)
         self.saveDataButton.clicked.connect(self.save_changes_object)
+        self.DrawSpaceshipTrajectory.clicked.connect(self.draw_spaceship_trajectory)
+
 
         self.get_all_etudes()
         self.typeObjectComboBox.addItems(['planet', 'starship'])
@@ -190,17 +191,18 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
 
         self.get_all_objects(self.thisFile)
 
-   
-    def HereAreWeGo(self):
-        def NewPoints(i):
-            global t, dt, plSystem, KSI, ETA,ZETA, VKSI, VETA,VZETA, Dksi, Deta,Dzeta, DVksi, DVeta,DVzeta, KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh,VZETA_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh,DVzeta_Sh, F_dv, Alpha,Beta
+    def draw_spaceship_trajectory(self):
+        self.progressBarDrawingSpTr.setValue(0) 
+        self.DrawSpaceshipTrajectory.setEnabled(False)
+
+        def NewPoints(i, traj):
+            global t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta
             t += 36000*dt
 
             #Методом Рунге - Кутты
-            Dksi1, Deta1,Dzeta1, DVksi1, DVeta1,DVzeta1 = plSystem.SpaceBodyMoveEquations(KSI, ETA, ZETA, VKSI, VETA,VZETA)
-            Dksi1_Sh, Deta1_Sh,Dzeta1_Sh, DVksi1_Sh, DVeta1_Sh,DVzeta1_Sh = plSystem.SpaceShipMoveEquations(KSI_Sh, ETA_Sh,ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, KSI, ETA, ZETA,VKSI, VETA, VZETA, F_dv, Alpha,Beta)
+            Dksi1, Deta1,Dzeta1, DVksi1, DVeta1,DVzeta1 = plSystem.SpaceBodyMoveEquations(ksi, eta, zeta, Vksi, Veta,Vzeta)
+            Dksi1_Sh, Deta1_Sh,Dzeta1_Sh, DVksi1_Sh, DVeta1_Sh,DVzeta1_Sh = plSystem.SpaceShipMoveEquations(ksi_Sh, eta_Sh,zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, ksi, eta, zeta,Vksi, Veta, Vzeta, F_dv, Alpha,Beta)
 
-            #
             Dksi1 = np.array(Dksi1)
             Deta1 = np.array(Deta1)
             Dzeta1 = np.array(Dzeta1)
@@ -216,10 +218,10 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             DVzeta1_Sh = np.array(DVzeta1_Sh)
 
 
-            Dksi2, Deta2, Dzeta2, DVksi2, DVeta2, DVzeta2 = plSystem.SpaceBodyMoveEquations(KSI+Dksi1/2*dt, ETA+Deta1/2*dt, ZETA+Dzeta1/2*dt, VKSI+DVksi1/2*dt, VETA+DVeta1/2*dt,VZETA+DVzeta1/2*dt)
+            Dksi2, Deta2, Dzeta2, DVksi2, DVeta2, DVzeta2 = plSystem.SpaceBodyMoveEquations(ksi+Dksi1/2*dt, eta+Deta1/2*dt, zeta+Dzeta1/2*dt, Vksi+DVksi1/2*dt, Veta+DVeta1/2*dt,Vzeta+DVzeta1/2*dt)
             Dksi2_Sh, Deta2_Sh,Dzeta2_Sh, DVksi2_Sh, DVeta2_Sh,DVzeta2_Sh = plSystem.SpaceShipMoveEquations(
-                KSI_Sh+Dksi1_Sh/2*dt, ETA_Sh+Deta1_Sh/2*dt, ZETA_Sh+Dzeta1_Sh/2*dt, VKSI_Sh+DVksi1_Sh/2*dt, VETA_Sh+DVeta1_Sh/2*dt,VZETA_Sh+DVzeta1_Sh/2*dt,
-                KSI+Dksi1/2*dt, ETA+Deta1/2*dt,ZETA+Dzeta1/2*dt, VKSI+DVksi1/2*dt, VETA+DVeta1/2*dt, VZETA+DVzeta1/2*dt, F_dv, Alpha,Beta)
+                ksi_Sh+Dksi1_Sh/2*dt, eta_Sh+Deta1_Sh/2*dt, zeta_Sh+Dzeta1_Sh/2*dt, Vksi_Sh+DVksi1_Sh/2*dt, Veta_Sh+DVeta1_Sh/2*dt,Vzeta_Sh+DVzeta1_Sh/2*dt,
+                ksi+Dksi1/2*dt, eta+Deta1/2*dt,zeta+Dzeta1/2*dt, Vksi+DVksi1/2*dt, Veta+DVeta1/2*dt, Vzeta+DVzeta1/2*dt, F_dv, Alpha,Beta)
 
             Dksi2 = np.array(Dksi2)
             Deta2 = np.array(Deta2)
@@ -234,12 +236,12 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             DVeta2_Sh = np.array(DVeta2_Sh)
             DVzeta2_Sh = np.array(DVzeta2_Sh)
 
-            Dksi3, Deta3, Dzeta3, DVksi3, DVeta3, DVzeta3 = plSystem.SpaceBodyMoveEquations(KSI+Dksi2/2*dt, ETA+Deta2/2*dt, ZETA+Dzeta2/2*dt, VKSI+DVksi2/2*dt, VETA+DVeta2/2*dt,VZETA+DVzeta2/2*dt)
+            Dksi3, Deta3, Dzeta3, DVksi3, DVeta3, DVzeta3 = plSystem.SpaceBodyMoveEquations(ksi+Dksi2/2*dt, eta+Deta2/2*dt, zeta+Dzeta2/2*dt, Vksi+DVksi2/2*dt, Veta+DVeta2/2*dt,Vzeta+DVzeta2/2*dt)
             Dksi3_Sh, Deta3_Sh, Dzeta3_Sh, DVksi3_Sh, DVeta3_Sh, DVzeta3_Sh = plSystem.SpaceShipMoveEquations(
-                KSI_Sh + Dksi2_Sh / 2 * dt, ETA_Sh + Deta2_Sh / 2 * dt, ZETA_Sh + Dzeta2_Sh / 2 * dt,
-                VKSI_Sh + DVksi2_Sh / 2 * dt, VETA_Sh + DVeta2_Sh / 2 * dt, VZETA_Sh + DVzeta2_Sh / 2 * dt,
-                KSI + Dksi2 / 2 * dt, ETA + Deta2 / 2 * dt, ZETA + Dzeta2 / 2 * dt, VKSI + DVksi2 / 2 * dt,
-                VETA + DVeta2 / 2 * dt, VZETA + DVzeta2 / 2 * dt, F_dv, Alpha, Beta)
+                ksi_Sh + Dksi2_Sh / 2 * dt, eta_Sh + Deta2_Sh / 2 * dt, zeta_Sh + Dzeta2_Sh / 2 * dt,
+                Vksi_Sh + DVksi2_Sh / 2 * dt, Veta_Sh + DVeta2_Sh / 2 * dt, Vzeta_Sh + DVzeta2_Sh / 2 * dt,
+                ksi + Dksi2 / 2 * dt, eta + Deta2 / 2 * dt, zeta + Dzeta2 / 2 * dt, Vksi + DVksi2 / 2 * dt,
+                Veta + DVeta2 / 2 * dt, Vzeta + DVzeta2 / 2 * dt, F_dv, Alpha, Beta)
 
             Dksi3 = np.array(Dksi3)
             Deta3 = np.array(Deta3)
@@ -254,12 +256,12 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             DVeta3_Sh = np.array(DVeta3_Sh)
             DVzeta3_Sh = np.array(DVzeta3_Sh)
 
-            Dksi4, Deta4, Dzeta4, DVksi4, DVeta4, DVzeta4  = plSystem.SpaceBodyMoveEquations(KSI+Dksi3/2*dt, ETA+Deta3/2*dt, ZETA+Dzeta3/2*dt, VKSI+DVksi3/2*dt, VETA+DVeta3/2*dt,VZETA+DVzeta3/2*dt)
+            Dksi4, Deta4, Dzeta4, DVksi4, DVeta4, DVzeta4  = plSystem.SpaceBodyMoveEquations(ksi+Dksi3/2*dt, eta+Deta3/2*dt, zeta+Dzeta3/2*dt, Vksi+DVksi3/2*dt, Veta+DVeta3/2*dt,Vzeta+DVzeta3/2*dt)
             Dksi4_Sh, Deta4_Sh, Dzeta4_Sh, DVksi4_Sh, DVeta4_Sh, DVzeta4_Sh = plSystem.SpaceShipMoveEquations(
-                KSI_Sh + Dksi3_Sh / 2 * dt, ETA_Sh + Deta3_Sh / 2 * dt, ZETA_Sh + Dzeta3_Sh / 2 * dt,
-                VKSI_Sh + DVksi3_Sh / 2 * dt, VETA_Sh + DVeta3_Sh / 2 * dt, VZETA_Sh + DVzeta3_Sh / 2 * dt,
-                KSI + Dksi3 / 2 * dt, ETA + Deta3 / 2 * dt, ZETA + Dzeta3 / 2 * dt, VKSI + DVksi3 / 2 * dt,
-                VETA + DVeta3 / 2 * dt, VZETA + DVzeta3 / 2 * dt, F_dv, Alpha, Beta)
+                ksi_Sh + Dksi3_Sh / 2 * dt, eta_Sh + Deta3_Sh / 2 * dt, zeta_Sh + Dzeta3_Sh / 2 * dt,
+                Vksi_Sh + DVksi3_Sh / 2 * dt, Veta_Sh + DVeta3_Sh / 2 * dt, Vzeta_Sh + DVzeta3_Sh / 2 * dt,
+                ksi + Dksi3 / 2 * dt, eta + Deta3 / 2 * dt, zeta + Dzeta3 / 2 * dt, Vksi + DVksi3 / 2 * dt,
+                Veta + DVeta3 / 2 * dt, Vzeta + DVzeta3 / 2 * dt, F_dv, Alpha, Beta)
 
             Dksi4 = np.array(Dksi4)
             Deta4 = np.array(Deta4)
@@ -274,41 +276,37 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             DVeta4_Sh = np.array(DVeta4_Sh)
             DVzeta4_Sh = np.array(DVzeta4_Sh)
 
-            KSI = KSI + dt/6 * (Dksi1 + 2*Dksi2 + 2*Dksi3 + Dksi4)
-            ETA = ETA + dt/6 * (Deta1 + 2*Deta2 + 2*Deta3 + Deta4)
-            ZETA = ZETA + dt / 6 * (Dzeta1 + 2 * Dzeta2 + 2 * Dzeta3 + Dzeta4)
+            ksi = ksi + dt/6 * (Dksi1 + 2*Dksi2 + 2*Dksi3 + Dksi4)
+            eta = eta + dt/6 * (Deta1 + 2*Deta2 + 2*Deta3 + Deta4)
+            zeta = zeta + dt / 6 * (Dzeta1 + 2 * Dzeta2 + 2 * Dzeta3 + Dzeta4)
 
-            VKSI = VKSI + dt/6 * (DVksi1 + 2*DVksi2 + 2*DVksi3 + DVksi4)
-            VETA = VETA + dt/6 * (DVeta1 + 2*DVeta2 + 2*DVeta3 + DVeta4)
-            VZETA = VZETA + dt / 6 * (DVzeta1 + 2 * DVzeta2 + 2 * DVzeta3 + DVzeta4)
+            Vksi = Vksi + dt/6 * (DVksi1 + 2*DVksi2 + 2*DVksi3 + DVksi4)
+            Veta = Veta + dt/6 * (DVeta1 + 2*DVeta2 + 2*DVeta3 + DVeta4)
+            Vzeta = Vzeta + dt / 6 * (DVzeta1 + 2 * DVzeta2 + 2 * DVzeta3 + DVzeta4)
 
-            KSI_Sh = KSI_Sh + dt / 6 * (Dksi1_Sh + 2 * Dksi2_Sh + 2 * Dksi3_Sh + Dksi4_Sh)
-            ETA_Sh = ETA_Sh + dt / 6 * (Deta1_Sh + 2 * Deta2_Sh + 2 * Deta3_Sh + Deta4_Sh)
-            ZETA_Sh = ZETA_Sh + dt / 6 * (Dzeta1_Sh + 2 * Dzeta2_Sh + 2 * Dzeta3_Sh + Dzeta4_Sh)
+            ksi_Sh = ksi_Sh + dt / 6 * (Dksi1_Sh + 2 * Dksi2_Sh + 2 * Dksi3_Sh + Dksi4_Sh)
+            eta_Sh = eta_Sh + dt / 6 * (Deta1_Sh + 2 * Deta2_Sh + 2 * Deta3_Sh + Deta4_Sh)
+            zeta_Sh = zeta_Sh + dt / 6 * (Dzeta1_Sh + 2 * Dzeta2_Sh + 2 * Dzeta3_Sh + Dzeta4_Sh)
 
-            VKSI_Sh = VKSI_Sh + dt / 6 * (DVksi1_Sh + 2 * DVksi2_Sh + 2 * DVksi3_Sh + DVksi4_Sh)
-            VETA_Sh = VETA_Sh + dt / 6 * (DVeta1_Sh + 2 * DVeta2_Sh + 2 * DVeta3_Sh + DVeta4_Sh)
-            VZETA_Sh = VZETA_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
+            Vksi_Sh = Vksi_Sh + dt / 6 * (DVksi1_Sh + 2 * DVksi2_Sh + 2 * DVksi3_Sh + DVksi4_Sh)
+            Veta_Sh = Veta_Sh + dt / 6 * (DVeta1_Sh + 2 * DVeta2_Sh + 2 * DVeta3_Sh + DVeta4_Sh)
+            Vzeta_Sh = Vzeta_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
 
-            # print(KSI, ETA, ZETA, VKSI, VETA,VZETA)
+            print('[x]', plSystem.spaceShip.ksi, plSystem.spaceShip.ksi, plSystem.spaceShip.ksi)
+            print('[x]', plSystem.spaceShip.ksi, plSystem.spaceShip.ksi, plSystem.spaceShip.ksi)
 
-            #print(KSI[1]-KSI[2], ETA[1]-ETA[2], ZETA[1]-ZETA[2])
-            #print(sp.sqrt((KSI[1]-KSI[2])**2+(ETA[1]-ETA[2])**2+(ZETA[1]-ZETA[2])**2))
-            plSystem.ReplaceSystem(KSI, ETA, ZETA, VKSI, VETA,VZETA, KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh)
 
-            #ctr_planet ='earth'
-            #ax.set_xlim3d(KSI[1]- 165, KSI[1] + 165)
-            #ax.set_ylim3d(ETA[1]- 165, ETA[1] + 165)
-            #ax.set_zlim3d(ZETA[1] - 165, ZETA[1] + 165)
+            plSystem.replace_system_without_draw(ksi, eta, zeta, Vksi, Veta,Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh)
 
-            drPlanets = [planet.DrawedPlanet for planet in plSystem.planets]
-            drTraces = [planet.DrawedTrace for planet in plSystem.planets]
 
-            return  [plSystem.spaceShip.DrawedSpaceShip]\
-                   + drTraces+drPlanets+ [plSystem.spaceShip.DrawedTrace]
+            traj.append([plSystem.spaceShip.ksi, plSystem.spaceShip.ksi, plSystem.spaceShip.ksi])
 
-        global t, dt, plSystem, KSI, ETA, ZETA, VKSI, VETA, VZETA,  Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh,DVzeta_Sh, F_dv, Alpha,Beta
-        
+
+            # return  [plSystem.spaceShip.DrawedTrace]
+
+        global t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta
+        t = 0.0
+
         #     Параметры массы
         dt = float(self.TStep_field.text())
 
@@ -329,7 +327,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         plSystem = PlanetSystem([])
         for i in self.fileData:
             if(i['type'] == 'planet'):
-                ksi, eta, zeta = [i["x"] / razm, i["y"] / razm, i["z"] / razm]
+                ksi_, eta_, zeta_ = [i["x"] / razm, i["y"] / razm, i["z"] / razm]
                 V_ksi, V_eta, V_zeta = [i["Vx"]  / (koff * razm), i["Vy"]  / (koff * razm), i["Vz"]  / (koff * razm)]
                 R =  i["R"] / razm
                 M = i["m"]
@@ -337,32 +335,40 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
 
                 ki = 0.9999999998 if i["name"] == 'Earth' else 0.01232376679 # Для обезразмеривания
 
-                plSystem.AddNewPlanet(Planet(ksi, eta, zeta, V_ksi, V_eta, V_zeta, ki, M, R, color))
+                plSystem.add_new_planet(Planet(ksi_, eta_, zeta_, V_ksi, V_eta, V_zeta, ki, M, R, color))
             else:
-                ksi, eta, zeta = [i["x"] / razm, i["y"] / razm, i["z"] / razm]
+                ksi_, eta_, zeta_ = [i["x"] / razm, i["y"] / razm, i["z"] / razm]
                 V_ksi, V_eta, V_zeta = [i["Vx"]  / (koff * razm), i["Vy"]  / (koff * razm), i["Vz"]  / (koff * razm)]
                 R =  6 * razm / razm
                 M = i["m"]
                 F_dv =  i["F_dv"]
 
-                plSystem.AddSpaceShip(SpaceShip(ksi, eta, zeta, V_ksi, V_eta, V_zeta, M, R, color, F_dv))
+                plSystem.add_spaceship(SpaceShip(ksi_, eta_, zeta_, V_ksi, V_eta, V_zeta, M, R, color, F_dv))
 
         # F_dv = 0 # Если убрать то будет норм двигатель работать для ракеты
 
         # ===================== Просчитываем траектории полета и получаем вектора ======================= #
         if((len(plSystem.planets) > 0 and hasattr(plSystem, "spaceShip")) or True): # Убрать TRUE
-            plSystem.GetMoveEquations()
-            KSI,ETA,ZETA, VKSI, VETA,VZETA = plSystem.GetStateVectors()
-            KSI_Sh = plSystem.spaceShip.ksi
-            ETA_Sh = plSystem.spaceShip.eta
-            ZETA_Sh = plSystem.spaceShip.zeta
-            VKSI_Sh = plSystem.spaceShip.Vksi
-            VETA_Sh = plSystem.spaceShip.Veta
-            VZETA_Sh = plSystem.spaceShip.Vzeta
+            plSystem.get_move_equations()
+            ksi,eta,zeta, Vksi, Veta,Vzeta = plSystem.get_state_vectors()
+            ksi_Sh = plSystem.spaceShip.ksi
+            eta_Sh = plSystem.spaceShip.eta
+            zeta_Sh = plSystem.spaceShip.zeta
+            Vksi_Sh = plSystem.spaceShip.Vksi
+            Veta_Sh = plSystem.spaceShip.Veta
+            Vzeta_Sh = plSystem.spaceShip.Vzeta 
 
+        dt = 0.01
+        cnt = 0
+        max_cnt = 10000
+        traj = []
+        while cnt != max_cnt:
+            NewPoints(dt, traj)
+            cnt+=1
+            self.progressBarDrawingSpTr.setValue(cnt*100/max_cnt) 
 
-        # ====================================== Отрисовка графика ====================================== #
-        t = 0.0
+        self.DrawSpaceshipTrajectory.setEnabled(True)
+
         Side = float(self.K_field.text()) # Сторона графика. С помощью нее можно увеличить графики
         self.SpWidget.canvas.axes.clear()
         self.SpWidget.canvas.axes.set(xlim=[-2*Side, 2*Side], ylim=[-Side, Side], zlim=[-Side, Side])
@@ -370,13 +376,201 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         self.SpWidget.canvas.axes.set_xlabel('X')
         self.SpWidget.canvas.axes.set_ylabel('Y')
         self.SpWidget.canvas.axes.set_zlabel('Z')
-        plSystem.Draw(self.SpWidget.canvas.axes)
+
+        self.SpWidget.canvas.axes.plot(plSystem.spaceShip.TraceKSI, plSystem.spaceShip.TraceETA, plSystem.spaceShip.TraceZETA, ':')
+
         self.SpWidget.canvas.show()
         fig = self.SpWidget.canvas.figure
+        self.SpWidget.canvas.draw()
+   
+    def HereAreWeGo(self):
+        def NewPoints(i):
+            global t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta
+            t += 36000*dt
+
+            #Методом Рунге - Кутты
+            Dksi1, Deta1,Dzeta1, DVksi1, DVeta1,DVzeta1 = plSystem.SpaceBodyMoveEquations(ksi, eta, zeta, Vksi, Veta,Vzeta)
+            Dksi1_Sh, Deta1_Sh,Dzeta1_Sh, DVksi1_Sh, DVeta1_Sh,DVzeta1_Sh = plSystem.SpaceShipMoveEquations(ksi_Sh, eta_Sh,zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, ksi, eta, zeta,Vksi, Veta, Vzeta, F_dv, Alpha,Beta)
+
+            #
+            Dksi1 = np.array(Dksi1)
+            Deta1 = np.array(Deta1)
+            Dzeta1 = np.array(Dzeta1)
+            DVksi1 = np.array(DVksi1)
+            DVeta1 = np.array(DVeta1)
+            DVzeta1 = np.array(DVzeta1)
+
+            Dksi1_Sh = np.array(Dksi1_Sh)
+            Deta1_Sh = np.array(Deta1_Sh)
+            Dzeta1_Sh = np.array(Dzeta1_Sh)
+            DVksi1_Sh = np.array(DVksi1_Sh)
+            DVeta1_Sh = np.array(DVeta1_Sh)
+            DVzeta1_Sh = np.array(DVzeta1_Sh)
+
+
+            Dksi2, Deta2, Dzeta2, DVksi2, DVeta2, DVzeta2 = plSystem.SpaceBodyMoveEquations(ksi+Dksi1/2*dt, eta+Deta1/2*dt, zeta+Dzeta1/2*dt, Vksi+DVksi1/2*dt, Veta+DVeta1/2*dt,Vzeta+DVzeta1/2*dt)
+            Dksi2_Sh, Deta2_Sh,Dzeta2_Sh, DVksi2_Sh, DVeta2_Sh,DVzeta2_Sh = plSystem.SpaceShipMoveEquations(
+                ksi_Sh+Dksi1_Sh/2*dt, eta_Sh+Deta1_Sh/2*dt, zeta_Sh+Dzeta1_Sh/2*dt, Vksi_Sh+DVksi1_Sh/2*dt, Veta_Sh+DVeta1_Sh/2*dt,Vzeta_Sh+DVzeta1_Sh/2*dt,
+                ksi+Dksi1/2*dt, eta+Deta1/2*dt,zeta+Dzeta1/2*dt, Vksi+DVksi1/2*dt, Veta+DVeta1/2*dt, Vzeta+DVzeta1/2*dt, F_dv, Alpha,Beta)
+
+            Dksi2 = np.array(Dksi2)
+            Deta2 = np.array(Deta2)
+            Dzeta2 = np.array(Dzeta2)
+            DVksi2 = np.array(DVksi2)
+            DVeta2 = np.array(DVeta2)
+            DVzeta2 = np.array(DVzeta2)
+            Dksi2_Sh = np.array(Dksi2_Sh)
+            Deta2_Sh = np.array(Deta2_Sh)
+            Dzeta2_Sh = np.array(Dzeta2_Sh)
+            DVksi2_Sh = np.array(DVksi2_Sh)
+            DVeta2_Sh = np.array(DVeta2_Sh)
+            DVzeta2_Sh = np.array(DVzeta2_Sh)
+
+            Dksi3, Deta3, Dzeta3, DVksi3, DVeta3, DVzeta3 = plSystem.SpaceBodyMoveEquations(ksi+Dksi2/2*dt, eta+Deta2/2*dt, zeta+Dzeta2/2*dt, Vksi+DVksi2/2*dt, Veta+DVeta2/2*dt,Vzeta+DVzeta2/2*dt)
+            Dksi3_Sh, Deta3_Sh, Dzeta3_Sh, DVksi3_Sh, DVeta3_Sh, DVzeta3_Sh = plSystem.SpaceShipMoveEquations(
+                ksi_Sh + Dksi2_Sh / 2 * dt, eta_Sh + Deta2_Sh / 2 * dt, zeta_Sh + Dzeta2_Sh / 2 * dt,
+                Vksi_Sh + DVksi2_Sh / 2 * dt, Veta_Sh + DVeta2_Sh / 2 * dt, Vzeta_Sh + DVzeta2_Sh / 2 * dt,
+                ksi + Dksi2 / 2 * dt, eta + Deta2 / 2 * dt, zeta + Dzeta2 / 2 * dt, Vksi + DVksi2 / 2 * dt,
+                Veta + DVeta2 / 2 * dt, Vzeta + DVzeta2 / 2 * dt, F_dv, Alpha, Beta)
+
+            Dksi3 = np.array(Dksi3)
+            Deta3 = np.array(Deta3)
+            Dzeta3 = np.array(Dzeta3)
+            DVksi3 = np.array(DVksi3)
+            DVeta3 = np.array(DVeta3)
+            DVzeta3 = np.array(DVzeta3)
+            Dksi3_Sh = np.array(Dksi3_Sh)
+            Deta3_Sh = np.array(Deta3_Sh)
+            Dzeta3_Sh = np.array(Dzeta3_Sh)
+            DVksi3_Sh = np.array(DVksi3_Sh)
+            DVeta3_Sh = np.array(DVeta3_Sh)
+            DVzeta3_Sh = np.array(DVzeta3_Sh)
+
+            Dksi4, Deta4, Dzeta4, DVksi4, DVeta4, DVzeta4  = plSystem.SpaceBodyMoveEquations(ksi+Dksi3/2*dt, eta+Deta3/2*dt, zeta+Dzeta3/2*dt, Vksi+DVksi3/2*dt, Veta+DVeta3/2*dt,Vzeta+DVzeta3/2*dt)
+            Dksi4_Sh, Deta4_Sh, Dzeta4_Sh, DVksi4_Sh, DVeta4_Sh, DVzeta4_Sh = plSystem.SpaceShipMoveEquations(
+                ksi_Sh + Dksi3_Sh / 2 * dt, eta_Sh + Deta3_Sh / 2 * dt, zeta_Sh + Dzeta3_Sh / 2 * dt,
+                Vksi_Sh + DVksi3_Sh / 2 * dt, Veta_Sh + DVeta3_Sh / 2 * dt, Vzeta_Sh + DVzeta3_Sh / 2 * dt,
+                ksi + Dksi3 / 2 * dt, eta + Deta3 / 2 * dt, zeta + Dzeta3 / 2 * dt, Vksi + DVksi3 / 2 * dt,
+                Veta + DVeta3 / 2 * dt, Vzeta + DVzeta3 / 2 * dt, F_dv, Alpha, Beta)
+
+            Dksi4 = np.array(Dksi4)
+            Deta4 = np.array(Deta4)
+            Dzeta4 = np.array(Dzeta4)
+            DVksi4 = np.array(DVksi4)
+            DVeta4 = np.array(DVeta4)
+            DVzeta4 = np.array(DVzeta4)
+            Dksi4_Sh = np.array(Dksi4_Sh)
+            Deta4_Sh = np.array(Deta4_Sh)
+            Dzeta4_Sh = np.array(Dzeta4_Sh)
+            DVksi4_Sh = np.array(DVksi4_Sh)
+            DVeta4_Sh = np.array(DVeta4_Sh)
+            DVzeta4_Sh = np.array(DVzeta4_Sh)
+
+            ksi = ksi + dt/6 * (Dksi1 + 2*Dksi2 + 2*Dksi3 + Dksi4)
+            eta = eta + dt/6 * (Deta1 + 2*Deta2 + 2*Deta3 + Deta4)
+            zeta = zeta + dt / 6 * (Dzeta1 + 2 * Dzeta2 + 2 * Dzeta3 + Dzeta4)
+
+            Vksi = Vksi + dt/6 * (DVksi1 + 2*DVksi2 + 2*DVksi3 + DVksi4)
+            Veta = Veta + dt/6 * (DVeta1 + 2*DVeta2 + 2*DVeta3 + DVeta4)
+            Vzeta = Vzeta + dt / 6 * (DVzeta1 + 2 * DVzeta2 + 2 * DVzeta3 + DVzeta4)
+
+            ksi_Sh = ksi_Sh + dt / 6 * (Dksi1_Sh + 2 * Dksi2_Sh + 2 * Dksi3_Sh + Dksi4_Sh)
+            eta_Sh = eta_Sh + dt / 6 * (Deta1_Sh + 2 * Deta2_Sh + 2 * Deta3_Sh + Deta4_Sh)
+            zeta_Sh = zeta_Sh + dt / 6 * (Dzeta1_Sh + 2 * Dzeta2_Sh + 2 * Dzeta3_Sh + Dzeta4_Sh)
+
+            Vksi_Sh = Vksi_Sh + dt / 6 * (DVksi1_Sh + 2 * DVksi2_Sh + 2 * DVksi3_Sh + DVksi4_Sh)
+            Veta_Sh = Veta_Sh + dt / 6 * (DVeta1_Sh + 2 * DVeta2_Sh + 2 * DVeta3_Sh + DVeta4_Sh)
+            Vzeta_Sh = Vzeta_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
+
+            print('[x]', ksi_Sh, eta_Sh, zeta_Sh)
+
+
+            #print(ksi[1]-ksi[2], eta[1]-eta[2], zeta[1]-zeta[2])
+            #print(sp.sqrt((ksi[1]-ksi[2])**2+(eta[1]-eta[2])**2+(zeta[1]-zeta[2])**2))
+            plSystem.replace_system(ksi, eta, zeta, Vksi, Veta,Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh)
+
+            #ctr_planet ='earth'
+            #ax.set_xlim3d(ksi[1]- 165, ksi[1] + 165)
+            #ax.set_ylim3d(eta[1]- 165, eta[1] + 165)
+            #ax.set_zlim3d(zeta[1] - 165, zeta[1] + 165)
+
+            drPlanets = [planet.DrawedPlanet for planet in plSystem.planets]
+            drTraces = [planet.DrawedTrace for planet in plSystem.planets]
+
+            return  [plSystem.spaceShip.DrawedSpaceShip]\
+                   + drTraces+drPlanets+ [plSystem.spaceShip.DrawedTrace]
+
+        global t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta
+        t = 0.0
+
+        #     Параметры массы
+        dt = float(self.TStep_field.text())
+
+        # Было задано до этого
+        # F_max = plSystem.spaceShip.F_dv
+        # F_dv = self.F_Bar.value()*F_max/100
+        # Alpha = self.Angle_Bar.value()/360*6.28+1.57
+
+        F_dv = 0 #2500 # Сила двигателя
+        Alpha = 0 #360/24*(t+dt) # Направленнность
+        Beta = 0
+
+
+        razm = 4.216424392e7 # Для обезразмеривания
+        koff = 7.29e-5 # Для обезразмеривания
+
+
+
+        plSystem = PlanetSystem([])
+        for i in self.fileData:
+            if(i['type'] == 'planet'):
+                ksi_, eta_, zeta_ = [i["x"] / razm, i["y"] / razm, i["z"] / razm]
+                V_ksi, V_eta, V_zeta = [i["Vx"]  / (koff * razm), i["Vy"]  / (koff * razm), i["Vz"]  / (koff * razm)]
+                R =  i["R"] / razm
+                M = i["m"]
+                color = i["color"]
+
+                ki = 0.9999999998 if i["name"] == 'Earth' else 0.01232376679 # Для обезразмеривания
+
+                plSystem.add_new_planet(Planet(ksi_, eta_, zeta_, V_ksi, V_eta, V_zeta, ki, M, R, color))
+            else:
+                ksi_, eta_, zeta_ = [i["x"] / razm, i["y"] / razm, i["z"] / razm]
+                V_ksi, V_eta, V_zeta = [i["Vx"]  / (koff * razm), i["Vy"]  / (koff * razm), i["Vz"]  / (koff * razm)]
+                R =  6 * razm / razm
+                M = i["m"]
+                F_dv =  i["F_dv"]
+
+                plSystem.add_spaceship(SpaceShip(ksi_, eta_, zeta_, V_ksi, V_eta, V_zeta, M, R, color, F_dv))
+
+        # F_dv = 0 # Если убрать то будет норм двигатель работать для ракеты
+
+        # ===================== Просчитываем траектории полета и получаем вектора ======================= #
+        if((len(plSystem.planets) > 0 and hasattr(plSystem, "spaceShip")) or True): # Убрать TRUE
+            plSystem.get_move_equations()
+            ksi,eta,zeta, Vksi, Veta,Vzeta = plSystem.get_state_vectors()
+            ksi_Sh = plSystem.spaceShip.ksi
+            eta_Sh = plSystem.spaceShip.eta
+            zeta_Sh = plSystem.spaceShip.zeta
+            Vksi_Sh = plSystem.spaceShip.Vksi
+            Veta_Sh = plSystem.spaceShip.Veta
+            Vzeta_Sh = plSystem.spaceShip.Vzeta
+
+
+        # ====================================== Отрисовка графика ====================================== #
+        Side = float(self.K_field.text()) # Сторона графика. С помощью нее можно увеличить графики
+        # self.SpWidget.canvas.axes.clear()
+        self.SpWidget.canvas.axes.set(xlim=[-2*Side, 2*Side], ylim=[-Side, Side], zlim=[-Side, Side])
+        self.SpWidget.canvas.axes.set_title('Это космос')
+        self.SpWidget.canvas.axes.set_xlabel('X')
+        self.SpWidget.canvas.axes.set_ylabel('Y')
+        self.SpWidget.canvas.axes.set_zlabel('Z')
+        plSystem.draw(self.SpWidget.canvas.axes)
+        self.SpWidget.canvas.show()
+        fig = self.SpWidget.canvas.figure
+        print('sss', dt * 1000)
         self.animation = FuncAnimation(fig, NewPoints, interval=dt * 1000, blit=True)
         self.SpWidget.canvas.draw()
-    
-            
+
 
 if __name__ == "__main__":
     app = QApplication([])
