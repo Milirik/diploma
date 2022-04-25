@@ -28,6 +28,11 @@ class SpaceWidget(QWidget):
 class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
+        self.koeffff = 0
+        self.flag = False
+
+
+
         self.setupUi(self)
         self.setWindowTitle("Творение")
 
@@ -191,6 +196,8 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
 
         self.get_all_objects(self.thisFile)
 
+
+
     def draw_spaceship_trajectory(self):
         self.progressBarDrawingSpTr.setValue(0) 
         self.DrawSpaceshipTrajectory.setEnabled(False)
@@ -292,8 +299,12 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             Veta_Sh = Veta_Sh + dt / 6 * (DVeta1_Sh + 2 * DVeta2_Sh + 2 * DVeta3_Sh + DVeta4_Sh)
             Vzeta_Sh = Vzeta_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
 
-            print('[x]', plSystem.spaceShip.ksi, plSystem.spaceShip.ksi, plSystem.spaceShip.ksi)
-            print('[x]', plSystem.spaceShip.ksi, plSystem.spaceShip.ksi, plSystem.spaceShip.ksi)
+            if(self.koeffff > 3500 and not self.flag):
+                plSystem.get_move_equations(True)
+                self.flag = True
+            else:
+                self.koeffff+=1
+            print(f'[x] ', plSystem.spaceShip.ksi, plSystem.spaceShip.eta, plSystem.spaceShip.zeta)
 
 
             plSystem.replace_system_without_draw(ksi, eta, zeta, Vksi, Veta,Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh)
@@ -328,6 +339,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         for i in self.fileData:
             if(i['type'] == 'planet'):
                 ksi_, eta_, zeta_ = [i["x"] / razm, i["y"] / razm, i["z"] / razm]
+                print('[!]', ksi_, eta_, zeta_)
                 V_ksi, V_eta, V_zeta = [i["Vx"]  / (koff * razm), i["Vy"]  / (koff * razm), i["Vz"]  / (koff * razm)]
                 R =  i["R"] / razm
                 M = i["m"]
@@ -349,7 +361,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
 
         # ===================== Просчитываем траектории полета и получаем вектора ======================= #
         if((len(plSystem.planets) > 0 and hasattr(plSystem, "spaceShip")) or True): # Убрать TRUE
-            plSystem.get_move_equations()
+            plSystem.get_move_equations(self.koeffff)
             ksi,eta,zeta, Vksi, Veta,Vzeta = plSystem.get_state_vectors()
             ksi_Sh = plSystem.spaceShip.ksi
             eta_Sh = plSystem.spaceShip.eta
@@ -360,7 +372,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
 
         dt = 0.01
         cnt = 0
-        max_cnt = 10000
+        max_cnt = 25000
         traj = []
         while cnt != max_cnt:
             NewPoints(dt, traj)
@@ -482,7 +494,13 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             Veta_Sh = Veta_Sh + dt / 6 * (DVeta1_Sh + 2 * DVeta2_Sh + 2 * DVeta3_Sh + DVeta4_Sh)
             Vzeta_Sh = Vzeta_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
 
-            print('[x]', ksi_Sh, eta_Sh, zeta_Sh)
+            if(self.koeffff > 3500 and not self.flag):
+                plSystem.get_move_equations(True)
+                self.flag = True
+            else:
+                self.koeffff+=1
+            print(f'[x] ', ksi_Sh, eta_Sh, zeta_Sh)
+
 
 
             #print(ksi[1]-ksi[2], eta[1]-eta[2], zeta[1]-zeta[2])
@@ -525,6 +543,8 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         for i in self.fileData:
             if(i['type'] == 'planet'):
                 ksi_, eta_, zeta_ = [i["x"] / razm, i["y"] / razm, i["z"] / razm]
+                print('[!]', ksi_, eta_, zeta_)
+
                 V_ksi, V_eta, V_zeta = [i["Vx"]  / (koff * razm), i["Vy"]  / (koff * razm), i["Vz"]  / (koff * razm)]
                 R =  i["R"] / razm
                 M = i["m"]
@@ -546,7 +566,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
 
         # ===================== Просчитываем траектории полета и получаем вектора ======================= #
         if((len(plSystem.planets) > 0 and hasattr(plSystem, "spaceShip")) or True): # Убрать TRUE
-            plSystem.get_move_equations()
+            plSystem.get_move_equations(self.koeffff)
             ksi,eta,zeta, Vksi, Veta,Vzeta = plSystem.get_state_vectors()
             ksi_Sh = plSystem.spaceShip.ksi
             eta_Sh = plSystem.spaceShip.eta
@@ -567,7 +587,6 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         plSystem.draw(self.SpWidget.canvas.axes)
         self.SpWidget.canvas.show()
         fig = self.SpWidget.canvas.figure
-        print('sss', dt * 1000)
         self.animation = FuncAnimation(fig, NewPoints, interval=dt * 1000, blit=True)
         self.SpWidget.canvas.draw()
 

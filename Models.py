@@ -9,10 +9,8 @@ import pickle
 
 
 class PlanetSystem():
-    def __init__(self, planets, spaceShip='NotEnoughGold'):
+    def __init__(self, planets):
         self.planets = planets
-        if spaceShip != 'NotEnoughGold':
-            self.spaceShip = spaceShip
 
     def add_new_planet(self, planet):
         self.planets.append(planet)
@@ -41,7 +39,7 @@ class PlanetSystem():
         if (self.spaceShip):
             self.spaceShip.draw(axes)
 
-    def get_move_equations(self):
+    def get_move_equations(self, obnul):
         n = len(self.planets)
         _strKSI = ''
         _strETA = ''
@@ -69,31 +67,37 @@ class PlanetSystem():
         DKSI= [Vksi for Vksi in VKSI]
         DETA = [Veta for Veta in VETA]
         DZETA = [Vzeta for Vzeta in VZETA]
-        DVKSI = [
-            sum([
-                (planet.k* (ksi - cur_ksi)) / (sp.sqrt((ksi - cur_ksi) ** 2 + (eta - cur_eta) ** 2 + (zeta - cur_zeta) ** 2) ** 3)
-                for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
-                if (ksi != cur_ksi)
-            ])
-            for cur_ksi, cur_eta, cur_zeta, current_planet in zip(KSI, ETA, ZETA, self.planets)
-        ]
+        # DVKSI = [
+        #     sum([
+        #         (planet.k* (ksi - cur_ksi)) / (sp.sqrt((ksi - cur_ksi) ** 2 + (eta - cur_eta) ** 2 + (zeta - cur_zeta) ** 2) ** 3)
+        #         for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
+        #         if (ksi != cur_ksi)
+        #     ])
+        #     for cur_ksi, cur_eta, cur_zeta, current_planet in zip(KSI, ETA, ZETA, self.planets)
+        # ]
 
-        DVETA = [
-            sum([
-                (planet.k* (eta - cur_eta)) / (sp.sqrt((ksi - cur_ksi) ** 2 + (eta - cur_eta) ** 2 + (zeta - cur_zeta) ** 2) ** 3)
-                for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
-                if (ksi != cur_ksi)
-            ])
-            for cur_ksi, cur_eta, cur_zeta, current_planet in zip(KSI, ETA, ZETA, self.planets)
-        ]
-        DVZETA = [
-            sum([
-                (planet.k*(zeta - cur_zeta)) / (sp.sqrt((ksi - cur_ksi) ** 2 + (eta - cur_eta) ** 2 + (zeta - cur_zeta) ** 2) ** 3)
-                for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
-                if (ksi != cur_ksi)
-            ])
-            for cur_ksi, cur_eta, cur_zeta, current_planet in zip(KSI, ETA, ZETA, self.planets)
-        ]
+        # DVETA = [
+        #     sum([
+        #         (planet.k* (eta - cur_eta)) / (sp.sqrt((ksi - cur_ksi) ** 2 + (eta - cur_eta) ** 2 + (zeta - cur_zeta) ** 2) ** 3)
+        #         for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
+        #         if (ksi != cur_ksi)
+        #     ])
+        #     for cur_ksi, cur_eta, cur_zeta, current_planet in zip(KSI, ETA, ZETA, self.planets)
+        # ]
+        # DVZETA = [
+        #     sum([
+        #         (planet.k*(zeta - cur_zeta)) / (sp.sqrt((ksi - cur_ksi) ** 2 + (eta - cur_eta) ** 2 + (zeta - cur_zeta) ** 2) ** 3)
+        #         for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
+        #         if (ksi != cur_ksi)
+        #     ])
+        #     for cur_ksi, cur_eta, cur_zeta, current_planet in zip(KSI, ETA, ZETA, self.planets)
+        # ]
+
+        DVKSI = 0
+        DVETA = 0
+        DVZETA = 0
+
+
         self.SpaceBodyMoveEquations = sp.lambdify([KSI, ETA, ZETA, VKSI, VETA, VZETA], [DKSI, DETA, DZETA, DVKSI, DVETA, DVZETA])
 
         if (self.spaceShip):
@@ -113,18 +117,27 @@ class PlanetSystem():
             DETA_Sh =VETA_Sh
             DZETA_Sh = VZETA_Sh
 
+            Fx_dv_vs_Earth = F_dv * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила x двигателя направленная против земли
+            Fy_dv_vs_Earth = F_dv * VETA_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила y двигателя направленная против земли
+            if(obnul):
+                Fx_dv_vs_Earth = 0
+                Fy_dv_vs_Earth = 0
+            print(f'[xF] Fx_dv_vs_Earth', Fx_dv_vs_Earth)
+            print(f'[xF] Fy_dv_vs_Earth', Fy_dv_vs_Earth)
+
+
             DVKSI_Sh = sum([
-                (planet.k* (ksi - KSI_Sh)) / (sp.sqrt((ksi - KSI_Sh) ** 2 + (eta - ETA_Sh) ** 2 + (zeta - ZETA_Sh) ** 2) ** 3)
+                (planet.k * (ksi - KSI_Sh)) / (sp.sqrt((ksi - KSI_Sh) ** 2 + (eta - ETA_Sh) ** 2 + (zeta - ZETA_Sh) ** 2) ** 3)
                 for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
-            ]) + F_dv * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2)) #+ F_dv / self.spaceShip.m * sp.cos(Alpha)#*sp.cos(Beta)
+            ]) + Fx_dv_vs_Earth
 
             DVETA_Sh = sum([
-                (planet.k* (eta - ETA_Sh)) / (sp.sqrt((ksi - KSI_Sh) ** 2 + (eta - ETA_Sh) ** 2 + (zeta - ZETA_Sh) ** 2) ** 3)
+                (planet.k * (eta - ETA_Sh)) / (sp.sqrt((ksi - KSI_Sh) ** 2 + (eta - ETA_Sh) ** 2 + (zeta - ZETA_Sh) ** 2) ** 3)
                 for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
-            ]) + F_dv * VETA_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  #+ F_dv / self.spaceShip.m * sp.sin(Alpha)#*sp.cos(Beta)
+            ]) + Fy_dv_vs_Earth
 
             DVZETA_Sh = sum([
-                (planet.k* (zeta - ZETA_Sh)) /  (sp.sqrt((ksi - KSI_Sh) ** 2 + (eta - ETA_Sh) ** 2 + (zeta - ZETA_Sh) ** 2) ** 3)
+                (planet.k * (zeta - ZETA_Sh)) /  (sp.sqrt((ksi - KSI_Sh) ** 2 + (eta - ETA_Sh) ** 2 + (zeta - ZETA_Sh) ** 2) ** 3)
                 for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
             ]) #+ F_dv / self.spaceShip.m * sp.sin(Beta)
 
@@ -194,7 +207,7 @@ class Planet():
 
     def draw(self, axes):
         self.DrawedPlanet = axes.plot(self.ksi, self.eta, self.zeta, marker='o',markersize=self.R*50,color=self.color)[0]
-        self.DrawedTrace = axes.plot(self.TraceKSI, self.TraceETA,self.TraceZETA, linestyle = 'solid',color=self.color)[0]
+        self.DrawedTrace = axes.plot(self.TraceKSI, self.TraceETA,self.TraceZETA, linestyle = ':',color=self.color)[0]
 
     def re_draw(self):
         self.DrawedPlanet.set_data_3d(self.ksi, self.eta,self.zeta)
