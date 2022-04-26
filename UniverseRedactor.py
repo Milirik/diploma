@@ -209,10 +209,9 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
     def draw_spaceship_trajectory(self):
         self.progressBarDrawingSpTr.setValue(0) 
         self.DrawSpaceshipTrajectory.setEnabled(False)
-        self.koeffff = 0
         self.flag = False
 
-        def NewPoints(i, traj):
+        def NewPoints(i, i2, traj):
             global t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta
             t += 36000*dt
 
@@ -309,15 +308,14 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             Veta_Sh = Veta_Sh + dt / 6 * (DVeta1_Sh + 2 * DVeta2_Sh + 2 * DVeta3_Sh + DVeta4_Sh)
             Vzeta_Sh = Vzeta_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
 
-            if(self.koeffff > int(self.K_stop_engine.text()) and not self.flag):
+            if(i > int(self.K_stop_engine.text()) and not self.flag):
                 plSystem.get_move_equations(True)
                 self.flag = True
-            else:
-                self.koeffff+=1
-                if(self.koeffff <= int(self.K_stop_engine.text())):
-                    self.K_toplivo_out.setText(str(int(self.koeffff*F_dv)))
 
-            print(f'[x] ', self.flag, self.koeffff, plSystem.spaceShip.ksi, plSystem.spaceShip.eta, plSystem.spaceShip.zeta)
+            if(i <= int(self.K_stop_engine.text())):
+                self.K_toplivo_out.setText(str(int(i*F_dv)))
+
+            print(f'[x] ', i, plSystem.spaceShip.ksi, plSystem.spaceShip.eta, plSystem.spaceShip.zeta)
 
 
             plSystem.replace_system_without_draw(ksi, eta, zeta, Vksi, Veta,Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh)
@@ -334,11 +332,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         #     Параметры массы
         dt = float(self.TStep_field.text())
 
-        # Было задано до этого
-        # F_max = plSystem.spaceShip.F_dv
-        # F_dv = self.F_Bar.value()*F_max/100
-        # Alpha = self.Angle_Bar.value()/360*6.28+1.57
-
+  
         F_dv = 0 #2500 # Сила двигателя
         Alpha = 0 #360/24*(t+dt) # Направленнность
         Beta = 0
@@ -374,7 +368,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
 
         # ===================== Просчитываем траектории полета и получаем вектора ======================= #
         if((len(plSystem.planets) > 0 and hasattr(plSystem, "spaceShip")) or True): # Убрать TRUE
-            plSystem.get_move_equations(self.koeffff)
+            plSystem.get_move_equations(False)
             ksi,eta,zeta, Vksi, Veta,Vzeta = plSystem.get_state_vectors()
             ksi_Sh = plSystem.spaceShip.ksi
             eta_Sh = plSystem.spaceShip.eta
@@ -388,7 +382,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         max_cnt = int(self.K_step_model.text())
         traj = []
         while cnt != max_cnt:
-            NewPoints(dt, traj)
+            NewPoints(cnt, dt, traj)
             cnt+=1
             self.progressBarDrawingSpTr.setValue(cnt*100/max_cnt) 
 
@@ -408,9 +402,9 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         self.SpWidget.canvas.draw()
    
     def HereAreWeGo(self):
-        self.koeffff = 0
         self.flag = False
         def NewPoints(i):
+            print('[i] ',i)
             global t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta
             t += 36000*dt
 
@@ -508,12 +502,14 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             Veta_Sh = Veta_Sh + dt / 6 * (DVeta1_Sh + 2 * DVeta2_Sh + 2 * DVeta3_Sh + DVeta4_Sh)
             Vzeta_Sh = Vzeta_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
 
-            if(self.koeffff > int(self.K_stop_engine.text()) and not self.flag):
+            if(i > int(self.K_stop_engine.text()) and not self.flag):
                 plSystem.get_move_equations(True)
                 self.flag = True
-            else:
-                self.koeffff+=1
-            print(f'[x] ', ksi_Sh, eta_Sh, zeta_Sh)
+
+            if(i <= int(self.K_stop_engine.text())):
+                self.K_toplivo_out.setText(str(int(i*F_dv)))
+
+            print(f'[x] ', i, ksi_Sh, eta_Sh, zeta_Sh)
 
 
 
@@ -580,7 +576,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
 
         # ===================== Просчитываем траектории полета и получаем вектора ======================= #
         if((len(plSystem.planets) > 0 and hasattr(plSystem, "spaceShip")) or True): # Убрать TRUE
-            plSystem.get_move_equations(self.koeffff)
+            plSystem.get_move_equations(False)
             ksi,eta,zeta, Vksi, Veta,Vzeta = plSystem.get_state_vectors()
             ksi_Sh = plSystem.spaceShip.ksi
             eta_Sh = plSystem.spaceShip.eta
