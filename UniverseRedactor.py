@@ -209,10 +209,9 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
     def draw_spaceship_trajectory(self):
         self.progressBarDrawingSpTr.setValue(0) 
         self.DrawSpaceshipTrajectory.setEnabled(False)
-        self.flag = False
 
         def NewPoints(i, i2, traj):
-            global t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta
+            global flag, t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
             t += 36000*dt
 
             #Методом Рунге - Кутты
@@ -308,11 +307,11 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             Veta_Sh = Veta_Sh + dt / 6 * (DVeta1_Sh + 2 * DVeta2_Sh + 2 * DVeta3_Sh + DVeta4_Sh)
             Vzeta_Sh = Vzeta_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
 
-            if(i > int(self.K_stop_engine.text()) and not self.flag):
+            if(i > int(K_stop_engine) and not flag):
                 plSystem.get_move_equations(True)
-                self.flag = True
+                flag = True
 
-            if(i <= int(self.K_stop_engine.text())):
+            if(i <= int(K_stop_engine)):
                 self.K_toplivo_out.setText(str(int(i*F_dv)))
 
             print(f'[x] ', i, plSystem.spaceShip.ksi, plSystem.spaceShip.eta, plSystem.spaceShip.zeta)
@@ -326,7 +325,8 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
 
             # return  [plSystem.spaceShip.DrawedTrace]
 
-        global t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta
+        global flag, t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+        flag = False
         t = 0.0
 
         #     Параметры массы
@@ -361,8 +361,10 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
                 R =  6 * razm / razm
                 M = i["m"]
                 F_dv =  i["F_dv"]
+                K_stop_engine_ = i["K_stop_engine"]
 
-                plSystem.add_spaceship(SpaceShip(ksi_, eta_, zeta_, V_ksi, V_eta, V_zeta, M, R, color, F_dv))
+
+                plSystem.add_spaceship(SpaceShip(ksi_, eta_, zeta_, V_ksi, V_eta, V_zeta, M, R, color, F_dv, K_stop_engine_))
 
         # F_dv = 0 # Если убрать то будет норм двигатель работать для ракеты
 
@@ -376,6 +378,8 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             Vksi_Sh = plSystem.spaceShip.Vksi
             Veta_Sh = plSystem.spaceShip.Veta
             Vzeta_Sh = plSystem.spaceShip.Vzeta 
+            K_stop_engine = plSystem.spaceShip.K_stop_engine
+
 
         dt = 0.01
         cnt = 0
@@ -402,10 +406,9 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         self.SpWidget.canvas.draw()
    
     def HereAreWeGo(self):
-        self.flag = False
         def NewPoints(i):
             print('[i] ',i)
-            global t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta
+            global flag, t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
             t += 36000*dt
 
             #Методом Рунге - Кутты
@@ -502,11 +505,11 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             Veta_Sh = Veta_Sh + dt / 6 * (DVeta1_Sh + 2 * DVeta2_Sh + 2 * DVeta3_Sh + DVeta4_Sh)
             Vzeta_Sh = Vzeta_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
 
-            if(i > int(self.K_stop_engine.text()) and not self.flag):
+            if(i > int(K_stop_engine) and not flag):
                 plSystem.get_move_equations(True)
-                self.flag = True
+                flag = True
 
-            if(i <= int(self.K_stop_engine.text())):
+            if(i <= int(K_stop_engine)):
                 self.K_toplivo_out.setText(str(int(i*F_dv)))
 
             print(f'[x] ', i, ksi_Sh, eta_Sh, zeta_Sh)
@@ -528,8 +531,9 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             return  [plSystem.spaceShip.DrawedSpaceShip]\
                    + drTraces+drPlanets+ [plSystem.spaceShip.DrawedTrace]
 
-        global t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta
+        global flag, t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
         t = 0.0
+        flag = False
 
         #     Параметры массы
         dt = float(self.TStep_field.text())
@@ -569,8 +573,9 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
                 R =  6 * razm / razm
                 M = i["m"]
                 F_dv =  i["F_dv"]
+                K_stop_engine_ = i["K_stop_engine"]
 
-                plSystem.add_spaceship(SpaceShip(ksi_, eta_, zeta_, V_ksi, V_eta, V_zeta, M, R, color, F_dv))
+                plSystem.add_spaceship(SpaceShip(ksi_, eta_, zeta_, V_ksi, V_eta, V_zeta, M, R, color, F_dv, K_stop_engine_))
 
         # F_dv = 0 # Если убрать то будет норм двигатель работать для ракеты
 
@@ -584,6 +589,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             Vksi_Sh = plSystem.spaceShip.Vksi
             Veta_Sh = plSystem.spaceShip.Veta
             Vzeta_Sh = plSystem.spaceShip.Vzeta
+            K_stop_engine = plSystem.spaceShip.K_stop_engine
 
 
         # ====================================== Отрисовка графика ====================================== #

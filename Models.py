@@ -214,7 +214,7 @@ class Planet():
         self.DrawedTrace.set_data_3d(self.TraceKSI, self.TraceETA,self.TraceZETA)
 
 class SpaceShip():
-    def __init__(self, ksi0, eta0, zeta0, Vksi0, Veta0,Vzeta0, m, R, color, F_max):
+    def __init__(self, ksi0, eta0, zeta0, Vksi0, Veta0,Vzeta0, m, R, color, F_max, K_stop_engine):
         self.ksi0 = ksi0
         self.eta0 = eta0
         self.zeta0 = zeta0
@@ -224,6 +224,7 @@ class SpaceShip():
         self.m = m
         self.R = R
         self.color = color
+        self.K_stop_engine = K_stop_engine
 
         self.ksi = ksi0
         self.eta = eta0
