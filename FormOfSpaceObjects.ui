@@ -90,7 +90,7 @@
     <property name="geometry">
      <rect>
       <x>1230</x>
-      <y>540</y>
+      <y>570</y>
       <width>151</width>
       <height>21</height>
      </rect>
@@ -627,7 +627,7 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>680</y>
+      <y>750</y>
       <width>141</width>
       <height>20</height>
      </rect>
@@ -646,7 +646,7 @@
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>680</y>
+      <y>750</y>
       <width>91</width>
       <height>22</height>
      </rect>
@@ -664,8 +664,8 @@
    <widget class="QPushButton" name="StopButton">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>900</y>
+      <x>540</x>
+      <y>860</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -687,7 +687,7 @@
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>720</y>
+      <y>790</y>
       <width>91</width>
       <height>22</height>
      </rect>
@@ -706,7 +706,7 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>720</y>
+      <y>790</y>
       <width>111</width>
       <height>20</height>
      </rect>
@@ -724,8 +724,8 @@
    <widget class="QPushButton" name="StartButton">
     <property name="geometry">
      <rect>
-      <x>420</x>
-      <y>900</y>
+      <x>400</x>
+      <y>860</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -747,7 +747,7 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>640</y>
+      <y>710</y>
       <width>181</width>
       <height>30</height>
      </rect>
@@ -1174,8 +1174,8 @@ color: rgb(255, 255, 255);</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>50</y>
+      <x>450</x>
+      <y>650</y>
       <width>211</width>
       <height>23</height>
      </rect>
@@ -1187,8 +1187,8 @@ color: rgb(255, 255, 255);</string>
    <widget class="QProgressBar" name="progressBarDrawingSpTr">
     <property name="geometry">
      <rect>
-      <x>580</x>
-      <y>50</y>
+      <x>670</x>
+      <y>650</y>
       <width>191</width>
       <height>21</height>
      </rect>
@@ -1204,7 +1204,7 @@ color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>590</x>
-      <y>640</y>
+      <y>710</y>
       <width>201</width>
       <height>30</height>
      </rect>
@@ -1224,7 +1224,7 @@ color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>590</x>
-      <y>680</y>
+      <y>750</y>
       <width>111</width>
       <height>20</height>
      </rect>
@@ -1243,7 +1243,7 @@ color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>680</y>
+      <y>750</y>
       <width>91</width>
       <height>22</height>
      </rect>
@@ -1259,6 +1259,110 @@ color: rgb(255, 255, 255);</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="K_stop_engine">
+    <property name="geometry">
+     <rect>
+      <x>1240</x>
+      <y>520</y>
+      <width>91</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>3500</string>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_12">
+    <property name="geometry">
+     <rect>
+      <x>1190</x>
+      <y>520</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Off F_дв</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_13">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>650</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Шагов:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="K_step_model">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>650</y>
+      <width>51</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>20000</string>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ClearGraph">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>860</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(233, 122, 127);</string>
+    </property>
+    <property name="text">
+     <string>Очистить график</string>
     </property>
    </widget>
   </widget>

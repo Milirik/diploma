@@ -31,8 +31,6 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         self.koeffff = 0
         self.flag = False
 
-
-
         self.setupUi(self)
         self.setWindowTitle("Творение")
 
@@ -44,9 +42,10 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         self.deleteEtudeButton.clicked.connect(self.delete_etude)
 
         self.StartButton.clicked.connect(self.start_simulation)
-        self.StartButton.clicked.connect(self.HereAreWeGo)          # ? так нужно...
-
+        self.StartButton.clicked.connect(self.HereAreWeGo)
         self.StopButton.clicked.connect(self.stop_simulation)
+        self.ClearGraph.clicked.connect(self.clear_graph)
+
 
         self.listUniverseObjectsWidget.currentItemChanged.connect(self.chose_object)
         self.createObjectButton.clicked.connect(self.create_new_object)
@@ -109,13 +108,18 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         except:
             print(f'[x] Файл {thisFile} не удалось удалить')
 
-
     def start_simulation(self):
-        pass
+        self.koeffff = 0
+        self.flag = False
 
     def stop_simulation(self):
         self.animation.event_source.stop()
+        self.koeffff = 0
+        self.flag = False
 
+    def clear_graph(self):
+        self.SpWidget.canvas.axes.clear()
+        pass
 
     def chose_object(self):
         
@@ -143,6 +147,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             self.F_dv_field.setText(str(object_["F_dv"]))
             self.Phi_field.setText(str(object_["Phi"]))
             self.Flamecolor_field.setText(str(object_["Fl_color"]))
+            self.K_stop_engine.setText(str(object_["K_stop_engine"]))
   
     def create_new_object(self):
         name_value = f'tmp{time.time()}' if self.nameObjectField.text() == "" else self.nameObjectField.text()
@@ -161,7 +166,8 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             "Vz": 0.0,
             "F_dv": 0.0,
             "Phi": 0.0,
-            "Fl_color": "yellow"
+            "Fl_color": "yellow",
+            "K_stop_engine": 0
         })
         with open(self.thisFile, "w") as write_file:
             json.dump(self.fileData, write_file)
@@ -191,6 +197,8 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         self.fileData[currentIndex]['F_dv'] = float(self.F_dv_field.text())
         self.fileData[currentIndex]['Phi'] = float(self.Phi_field.text())
         self.fileData[currentIndex]['Fl_color'] = self.Flamecolor_field.text()
+        self.fileData[currentIndex]['K_stop_engine'] = int(self.K_stop_engine.text())
+
         with open(self.thisFile, "w") as write_file:
             json.dump(self.fileData, write_file)
 
@@ -201,6 +209,8 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
     def draw_spaceship_trajectory(self):
         self.progressBarDrawingSpTr.setValue(0) 
         self.DrawSpaceshipTrajectory.setEnabled(False)
+        self.koeffff = 0
+        self.flag = False
 
         def NewPoints(i, traj):
             global t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta
@@ -299,12 +309,15 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             Veta_Sh = Veta_Sh + dt / 6 * (DVeta1_Sh + 2 * DVeta2_Sh + 2 * DVeta3_Sh + DVeta4_Sh)
             Vzeta_Sh = Vzeta_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
 
-            if(self.koeffff > 3500 and not self.flag):
+            if(self.koeffff > int(self.K_stop_engine.text()) and not self.flag):
                 plSystem.get_move_equations(True)
                 self.flag = True
             else:
                 self.koeffff+=1
-            print(f'[x] ', plSystem.spaceShip.ksi, plSystem.spaceShip.eta, plSystem.spaceShip.zeta)
+                if(self.koeffff <= int(self.K_stop_engine.text())):
+                    self.K_toplivo_out.setText(str(int(self.koeffff*F_dv)))
+
+            print(f'[x] ', self.flag, self.koeffff, plSystem.spaceShip.ksi, plSystem.spaceShip.eta, plSystem.spaceShip.zeta)
 
 
             plSystem.replace_system_without_draw(ksi, eta, zeta, Vksi, Veta,Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh)
@@ -372,7 +385,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
 
         dt = 0.01
         cnt = 0
-        max_cnt = 25000
+        max_cnt = int(self.K_step_model.text())
         traj = []
         while cnt != max_cnt:
             NewPoints(dt, traj)
@@ -382,7 +395,6 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         self.DrawSpaceshipTrajectory.setEnabled(True)
 
         Side = float(self.K_field.text()) # Сторона графика. С помощью нее можно увеличить графики
-        self.SpWidget.canvas.axes.clear()
         self.SpWidget.canvas.axes.set(xlim=[-2*Side, 2*Side], ylim=[-Side, Side], zlim=[-Side, Side])
         self.SpWidget.canvas.axes.set_title('Это космос')
         self.SpWidget.canvas.axes.set_xlabel('X')
@@ -396,6 +408,8 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         self.SpWidget.canvas.draw()
    
     def HereAreWeGo(self):
+        self.koeffff = 0
+        self.flag = False
         def NewPoints(i):
             global t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta
             t += 36000*dt
@@ -494,7 +508,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             Veta_Sh = Veta_Sh + dt / 6 * (DVeta1_Sh + 2 * DVeta2_Sh + 2 * DVeta3_Sh + DVeta4_Sh)
             Vzeta_Sh = Vzeta_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
 
-            if(self.koeffff > 3500 and not self.flag):
+            if(self.koeffff > int(self.K_stop_engine.text()) and not self.flag):
                 plSystem.get_move_equations(True)
                 self.flag = True
             else:
@@ -578,7 +592,6 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
 
         # ====================================== Отрисовка графика ====================================== #
         Side = float(self.K_field.text()) # Сторона графика. С помощью нее можно увеличить графики
-        # self.SpWidget.canvas.axes.clear()
         self.SpWidget.canvas.axes.set(xlim=[-2*Side, 2*Side], ylim=[-Side, Side], zlim=[-Side, Side])
         self.SpWidget.canvas.axes.set_title('Это космос')
         self.SpWidget.canvas.axes.set_xlabel('X')
