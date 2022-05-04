@@ -388,6 +388,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
         while cnt != max_cnt:
             NewPoints(cnt, dt, traj)
             cnt+=1
+            print(cnt*100/max_cnt)
             self.progressBarDrawingSpTr.setValue(cnt*100/max_cnt) 
 
         self.DrawSpaceshipTrajectory.setEnabled(True)
@@ -512,7 +513,7 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow):
             if(i <= int(K_stop_engine)):
                 self.K_toplivo_out.setText(str(int(i*F_dv)))
 
-            print(f'[x] ', i, ksi_Sh, eta_Sh, zeta_Sh)
+            print(f'[x] ', i, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh)
 
 
 
