@@ -28,9 +28,6 @@ class SpaceWidget(QWidget):
 class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow, SpaceSystemModelling):
     def __init__(self):
         QMainWindow.__init__(self)
-        self.koeffff = 0
-        self.flag = False
-
         self.setupUi(self)
         self.setWindowTitle("Творение")
 
@@ -41,29 +38,20 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow, SpaceSystemMode
         self.createEtudeButton.clicked.connect(self.create_new_etude)
         self.deleteEtudeButton.clicked.connect(self.delete_etude)
 
+        self.DrawSpaceshipTrajectory.clicked.connect(lambda: self.start_simulation(is_draw_only_trajectory=True))
         self.StartButton.clicked.connect(self.start_simulation)
-        self.StartButton.clicked.connect(self.HereAreWeGo)
         self.StopButton.clicked.connect(self.stop_simulation)
         self.ClearGraph.clicked.connect(self.clear_graph)
-
 
         self.listUniverseObjectsWidget.currentItemChanged.connect(self.chose_object)
         self.createObjectButton.clicked.connect(self.create_new_object)
         self.deleteObjectButton.clicked.connect(self.delete_object)
         self.saveDataButton.clicked.connect(self.save_changes_object)
-        self.DrawSpaceshipTrajectory.clicked.connect(self.draw_spaceship_trajectory)
-
 
         self.get_all_etudes()
         self.typeObjectComboBox.addItems(['planet', 'starship'])
-
         self.addToolBar(NavigationToolbar(self.SpWidget.canvas, self))
 
-        # self.AddPlanet.clicked.connect(self.AddPlanetFunction)
-        # self.AddStar.clicked.connect(self.AddStarFunction)
-        # self.AddShip.clicked.connect(self.AddShipFunction)
-        # self.ShowSystem.clicked.connect(self.ShowSystemFunction)
-        # self.deleteButton.clicked.connect(self.DeleteItemFunction)
 
     def get_all_etudes(self):
         self.listEtudes.clear()
@@ -108,14 +96,12 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow, SpaceSystemMode
         except:
             print(f'[x] Файл {thisFile} не удалось удалить')
 
-    def start_simulation(self):
-        self.koeffff = 0
-        self.flag = False
+    def start_simulation(self, is_draw_only_trajectory):
+        if(is_draw_only_trajectory): self.HereAreWeGo(is_draw_only_trajectory)
+        else: self.HereAreWeGo()
 
     def stop_simulation(self):
         self.animation.event_source.stop()
-        self.koeffff = 0
-        self.flag = False
 
     def clear_graph(self):
         self.SpWidget.canvas.axes.clear()
@@ -204,10 +190,6 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow, SpaceSystemMode
 
         self.get_all_objects(self.thisFile)
 
-
-
-   
-    
 
 if __name__ == "__main__":
     app = QApplication([])
