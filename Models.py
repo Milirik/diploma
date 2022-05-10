@@ -67,35 +67,31 @@ class PlanetSystem():
         DKSI= [Vksi for Vksi in VKSI]
         DETA = [Veta for Veta in VETA]
         DZETA = [Vzeta for Vzeta in VZETA]
-        # DVKSI = [
-        #     sum([
-        #         (planet.k* (ksi - cur_ksi)) / (sp.sqrt((ksi - cur_ksi) ** 2 + (eta - cur_eta) ** 2 + (zeta - cur_zeta) ** 2) ** 3)
-        #         for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
-        #         if (ksi != cur_ksi)
-        #     ])
-        #     for cur_ksi, cur_eta, cur_zeta, current_planet in zip(KSI, ETA, ZETA, self.planets)
-        # ]
+        DVKSI = [
+            sum([
+                (planet.k* (ksi - cur_ksi)) / (sp.sqrt((ksi - cur_ksi) ** 2 + (eta - cur_eta) ** 2 + (zeta - cur_zeta) ** 2) ** 3)
+                for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
+                if (ksi != cur_ksi)
+            ])
+            for cur_ksi, cur_eta, cur_zeta, current_planet in zip(KSI, ETA, ZETA, self.planets)
+        ]
 
-        # DVETA = [
-        #     sum([
-        #         (planet.k* (eta - cur_eta)) / (sp.sqrt((ksi - cur_ksi) ** 2 + (eta - cur_eta) ** 2 + (zeta - cur_zeta) ** 2) ** 3)
-        #         for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
-        #         if (ksi != cur_ksi)
-        #     ])
-        #     for cur_ksi, cur_eta, cur_zeta, current_planet in zip(KSI, ETA, ZETA, self.planets)
-        # ]
-        # DVZETA = [
-        #     sum([
-        #         (planet.k*(zeta - cur_zeta)) / (sp.sqrt((ksi - cur_ksi) ** 2 + (eta - cur_eta) ** 2 + (zeta - cur_zeta) ** 2) ** 3)
-        #         for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
-        #         if (ksi != cur_ksi)
-        #     ])
-        #     for cur_ksi, cur_eta, cur_zeta, current_planet in zip(KSI, ETA, ZETA, self.planets)
-        # ]
-
-        DVKSI = 0
-        DVETA = 0
-        DVZETA = 0
+        DVETA = [
+            sum([
+                (planet.k* (eta - cur_eta)) / (sp.sqrt((ksi - cur_ksi) ** 2 + (eta - cur_eta) ** 2 + (zeta - cur_zeta) ** 2) ** 3)
+                for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
+                if (ksi != cur_ksi)
+            ])
+            for cur_ksi, cur_eta, cur_zeta, current_planet in zip(KSI, ETA, ZETA, self.planets)
+        ]
+        DVZETA = [
+            sum([
+                (planet.k*(zeta - cur_zeta)) / (sp.sqrt((ksi - cur_ksi) ** 2 + (eta - cur_eta) ** 2 + (zeta - cur_zeta) ** 2) ** 3)
+                for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
+                if (ksi != cur_ksi)
+            ])
+            for cur_ksi, cur_eta, cur_zeta, current_planet in zip(KSI, ETA, ZETA, self.planets)
+        ]
 
 
         self.SpaceBodyMoveEquations = sp.lambdify([KSI, ETA, ZETA, VKSI, VETA, VZETA], [DKSI, DETA, DZETA, DVKSI, DVETA, DVZETA])
