@@ -116,8 +116,9 @@ class SpaceSystemModelling:
 			    plSystem.replace_system_without_draw(ksi, eta, zeta, Vksi, Veta,Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh)
 			    traj.append([plSystem.spaceShip.ksi, plSystem.spaceShip.ksi, plSystem.spaceShip.ksi])
 			else:
-				print(f'[x] ', i, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh)
-				plSystem.replace_system(ksi, eta, zeta, Vksi, Veta,Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh)
+				# print(f'[x] ', i, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh)
+				print(f'[moon] ', i, ksi, eta, Vksi, Veta)
+				plSystem.replace_system(ksi, eta, zeta, Vksi, Veta, Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh)
 				drPlanets = [planet.DrawedPlanet for planet in plSystem.planets]
 				drTraces = [planet.DrawedTrace for planet in plSystem.planets]
 				return  [plSystem.spaceShip.DrawedSpaceShip]\
