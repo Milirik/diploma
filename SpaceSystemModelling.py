@@ -26,7 +26,8 @@ class SpaceSystemModelling:
 			'x': [],
 			'y': [],
 			't': [],
-			'V': []
+			'V': [],
+			'r': []
 		}
 
 
@@ -146,6 +147,8 @@ class SpaceSystemModelling:
 				self.moveDataCoordinates['y'].append(eta_Sh)
 				self.moveDataCoordinates['t'].append(i)
 				self.moveDataCoordinates['V'].append(np.sqrt(Vksi_Sh**2 + Veta_Sh**2))
+				self.moveDataCoordinates['r'].append(np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2))
+
 
 
 				if(i > max_cnt-2 and not self.is_load): #
@@ -211,6 +214,7 @@ class SpaceSystemModelling:
 		F_dv = 0 #2500 # Сила двигателя
 		Alpha = 0 #360/24*(t+dt) # Направленнность
 		Beta = 0
+		
 
 
 		razm = 4.216424392e7 # Для обезразмеривания
@@ -228,6 +232,18 @@ class SpaceSystemModelling:
 		        color = i["color"]
 
 		        ki = 0.9999999998 if i["name"] == 'Earth' else 0.01232376679 # Для обезразмеривания
+
+		        phi = float(self.moonPhi.text())
+		        ksi_1 = ksi_ * np.cos(phi) - eta_ * np.sin(phi)
+		        eta_1 = ksi_ * np.sin(phi) + eta_ * np.cos(phi)
+
+		        V_ksi1 = V_ksi * np.cos(phi) - V_eta * np.sin(phi)
+		        V_eta1 = V_ksi * np.sin(phi) + V_eta * np.cos(phi)
+
+		        ksi_ = ksi_1
+		        eta_ = eta_1
+		        V_ksi = V_ksi1
+		        V_eta = V_eta1
 
 		        plSystem.add_new_planet(Planet(ksi_, eta_, zeta_, V_ksi, V_eta, V_zeta, ki, M, R, color))
 		    else:
