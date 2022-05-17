@@ -1,18 +1,36 @@
 from Models import PlanetSystem, Planet, SpaceShip
 import numpy as np
 from matplotlib.animation import FuncAnimation
+import json
 
 
 class SpaceSystemModelling:
+	def __init__(self):
+		pass
+
+	def load_info(self):
+		print(self.moveDataVelocity)
+		self.is_load = True
+		name_value = f'DataForAnalysis'
+		with open(f"./data_for_analysis/{name_value}.json", "w") as write_file:
+			json.dump([self.moveDataVelocity], write_file)
+
+
 	def HereAreWeGo(self, is_draw_only_trajectory=False):
+		self.moveDataVelocity = {
+			'Vx': [],
+			'Vy': []
+		}
+		self.is_load = False
+
 		def NewPoints(i):
-			global flag, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+			global OnOffEngine, flag, flag2, flag3, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
 
 
-			if(len(ksi) > 1):
-				rast = np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2 +(zeta_Sh - zeta[1])**2)
-				if(rast < 1):
-					dt = 0.0001
+			# if(len(ksi) > 0.2):
+			# 	rast = np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2 +(zeta_Sh - zeta[1])**2)
+			# 	if(rast < 1):
+			# 		dt = 0.0001
 
 
 			#Методом Рунге - Кутты
@@ -108,9 +126,29 @@ class SpaceSystemModelling:
 			Veta_Sh = Veta_Sh + dt / 6 * (DVeta1_Sh + 2 * DVeta2_Sh + 2 * DVeta3_Sh + DVeta4_Sh)
 			Vzeta_Sh = Vzeta_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
 
-			if(i > int(K_stop_engine) and not flag):
-			    plSystem.get_move_equations(True)
-			    flag = True
+
+
+			try:
+				self.moveDataVelocity['Vx'].append({'i': i, 'Vx': Vksi[1]})
+				self.moveDataVelocity['Vy'].append({'i': i, 'Vy': Veta[1]})
+
+				if(i > 18194 and not self.is_load):
+					self.load_info()
+			except:
+				print('Ошибка в запоминании данных')
+
+
+
+			for t in range(len(OnOffEngine)):
+				if(i > OnOffEngine[t]['start'] and not OnOffEngine[t]['is_started']):
+					print('On')
+					plSystem.get_move_equations(True)
+					OnOffEngine[t]['is_started'] = True
+				elif (i > OnOffEngine[t]['stop'] and not OnOffEngine[t]['is_stoped']):
+					print('Off')
+					plSystem.get_move_equations(False)
+					OnOffEngine[t]['is_stoped'] = True
+
 
 			if(i <= int(K_stop_engine)):
 			    self.K_toplivo_out.setText(str(int(i*F_dv)))
@@ -120,20 +158,28 @@ class SpaceSystemModelling:
 			    print(f'[x] ', i, plSystem.spaceShip.ksi, plSystem.spaceShip.eta, plSystem.spaceShip.zeta, Vksi_Sh, Veta_Sh)
 			    plSystem.replace_system_without_draw(ksi, eta, zeta, Vksi, Veta,Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh)
 			else:
+				steps_with_engine_on = OnOffEngine
+				# for k in OnOffEngine: 
+				# 	steps_with_engine_on.extend(list(range(k['start'], k['stop'])))
+
 				# print(f'[x] ', i, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh)
 				print(f'[moon] ', i, ksi[1], eta[1], Vksi[1], Veta[1])
-				plSystem.replace_system(ksi, eta, zeta, Vksi, Veta, Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, i)
+				plSystem.replace_system(ksi, eta, zeta, Vksi, Veta, Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, i, steps_with_engine_on)
 				drPlanets = [planet.DrawedPlanet for planet in plSystem.planets]
 				drTraces = [planet.DrawedTrace for planet in plSystem.planets]
 				return  [plSystem.spaceShip.DrawedSpaceShip]\
-				       + drTraces+drPlanets + [plSystem.spaceShip.DrawedTraceEngineOn] + [plSystem.spaceShip.DrawedTrace] \
+				       + drTraces+drPlanets + [plSystem.spaceShip.DrawedTraceEngineOn] + [plSystem.spaceShip.DrawedTraceEngineOnNearMoon] + [plSystem.spaceShip.DrawedTraceAfterMoon] + [plSystem.spaceShip.DrawedTrace] # \
 				       # + [plSystem.spaceShip.DrawedSpaceShipFlame]
-			# self.SpWidget.canvas.axes.axis('scaled')
-			# self.SpWidget.canvas.axes.set(xlim=[Side+ksi_Sh, Side+ksi_Sh], ylim=[-Side+eta_Sh, Side+eta_Sh])
 
 
-		global flag, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+
+
+
+		global OnOffEngine, flag, flag2, flag3, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
 		flag = False
+		flag2 = False
+		flag3 = False
+
 
 		#     Параметры массы
 		dt = float(self.TStep_field.text())
@@ -150,7 +196,6 @@ class SpaceSystemModelling:
 
 		razm = 4.216424392e7 # Для обезразмеривания
 		koff = 7.29e-5 # Для обезразмеривания
-
 
 
 		plSystem = PlanetSystem([])
@@ -178,9 +223,15 @@ class SpaceSystemModelling:
 
 		# F_dv = 0 # Если убрать то будет норм двигатель работать для ракеты
 
+		OnOffEngine = [
+			{'start': 0, 'stop': int(K_stop_engine_), 'is_started': False, 'is_stoped': False},
+			{'start': 7900, 'stop': int(8000), 'is_started': False, 'is_stoped': False}
+		]
+
+
 		# ===================== Просчитываем траектории полета и получаем вектора ======================= #
 		if((len(plSystem.planets) > 0 and hasattr(plSystem, "spaceShip")) or True): # Убрать TRUE
-		    plSystem.get_move_equations(False)
+		    plSystem.get_move_equations(True)
 		    ksi, eta, zeta, Vksi, Veta,Vzeta = plSystem.get_state_vectors()
 		    ksi_Sh = plSystem.spaceShip.ksi
 		    eta_Sh = plSystem.spaceShip.eta
@@ -209,7 +260,8 @@ class SpaceSystemModelling:
 
 
 		Side = float(self.K_field.text()) # Сторона графика. С помощью нее можно увеличить графики
-		self.SpWidget.canvas.axes.set(xlim=[-4.6, -3.7], ylim=[4.8, 3.9], zlim=[-Side, Side])
+		# self.SpWidget.canvas.axes.set(xlim=[-4.6, -3.7], ylim=[4.8, 3.9], zlim=[-Side, Side])
+		self.SpWidget.canvas.axes.set(xlim=[-Side, Side], ylim=[-Side, Side], zlim=[-Side, Side])
 		self.SpWidget.canvas.axes.set_title('Это космос')
 		self.SpWidget.canvas.axes.set_xlabel('X')
 		self.SpWidget.canvas.axes.set_ylabel('Y')
@@ -230,7 +282,5 @@ class SpaceSystemModelling:
 		else:
 			self.animation = FuncAnimation(fig, NewPoints, interval=dt * 1000, blit=True)
 
+
 		self.SpWidget.canvas.draw()
-
-
-

@@ -62,7 +62,6 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow, SpaceSystemMode
         #     t = self.listEtudes.takeItem(0)
         #     t.setSelected(True)
 
-
     def get_all_objects(self, file):
         fileData = []
         try:

@@ -586,7 +586,7 @@ class Ui_MainWindow(object):
         self.K_stop_engine.setText(_translate("MainWindow", "3500"))
         self.label_12.setText(_translate("MainWindow", "Off F_дв"))
         self.label_13.setText(_translate("MainWindow", "Шагов:"))
-        self.K_step_model.setText(_translate("MainWindow", "20000"))
+        self.K_step_model.setText(_translate("MainWindow", "15000"))
         self.ClearGraph.setText(_translate("MainWindow", "Очистить график"))
 from spacewidget import SpaceWidget
 

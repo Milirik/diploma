@@ -18,13 +18,13 @@ class PlanetSystem():
     def add_spaceship(self, spaceShip):
         self.spaceShip = spaceShip
 
-    def replace_system(self, KSI, ETA, ZETA, VKSI, VETA, VZETA, KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, current_step, Phi_Sh=0, F_curr=0):
+    def replace_system(self, KSI, ETA, ZETA, VKSI, VETA, VZETA, KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, current_step, steps_with_engine_on, Phi_Sh=0, F_curr=0):
         for planet, ksi, eta, zeta, vksi, veta, vzeta in zip(self.planets, KSI, ETA, ZETA, VKSI, VETA, VZETA):
             planet.replace(ksi, eta, zeta, vksi, veta, vzeta)
             planet.re_draw()
         if (self.spaceShip):
             self.spaceShip.replace(KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, Phi_Sh, F_curr)
-            self.spaceShip.re_draw(current_step)
+            self.spaceShip.re_draw(current_step, steps_with_engine_on)
 
     def replace_system_without_draw(self, KSI, ETA, ZETA, VKSI, VETA, VZETA, KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, Phi_Sh=0, F_curr=0):
         for planet, ksi, eta, zeta, vksi, veta, vzeta in zip(self.planets, KSI, ETA, ZETA, VKSI, VETA, VZETA):
@@ -39,7 +39,7 @@ class PlanetSystem():
         if (self.spaceShip):
             self.spaceShip.draw(axes)
 
-    def get_move_equations(self, obnul):
+    def get_move_equations(self, is_on):
         n = len(self.planets)
         _strKSI = ''
         _strETA = ''
@@ -113,13 +113,16 @@ class PlanetSystem():
             DETA_Sh =VETA_Sh
             DZETA_Sh = VZETA_Sh
 
-            Fx_dv_vs_Earth = F_dv * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила x двигателя направленная против земли
-            Fy_dv_vs_Earth = F_dv * VETA_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила y двигателя направленная против земли
-            if(obnul):
+           
+            if(not is_on):
                 Fx_dv_vs_Earth = 0
                 Fy_dv_vs_Earth = 0
-            # print(f'[xF] Fx_dv_vs_Earth', Fx_dv_vs_Earth)
-            # print(f'[xF] Fy_dv_vs_Earth', Fy_dv_vs_Earth)
+            else:
+                Fx_dv_vs_Earth = F_dv * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила x двигателя направленная против земли
+                Fy_dv_vs_Earth = F_dv * VETA_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила y двигателя направленная против земли
+
+            print(f'[xF] Fx_dv_vs_Earth', Fx_dv_vs_Earth)
+            print(f'[xF] Fy_dv_vs_Earth', Fy_dv_vs_Earth)
 
 
             DVKSI_Sh = sum([
@@ -259,22 +262,57 @@ class SpaceShip():
         self.DrawedSpaceShip = axes.plot(self.ksi, self.eta, self.zeta,marker='o',markersize=1, color=self.color)[0]
         self.DrawedSpaceShipFlame = axes.plot(self.ksi, self.eta, self.zeta, color='orange')[0]
         
-
-        self.DrawedTrace = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='blue')[0]
+        self.DrawedTraceEngineOnNearMoon = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='red')[0]
         self.DrawedTraceEngineOn = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='red')[0]
 
+        self.DrawedTraceAfterMoon = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='blue')[0]
+        self.DrawedTrace = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='blue')[0]
 
-    def re_draw(self, current_step):
 
+    def re_draw(self, current_step, steps_with_engine_on):
         self.DrawedSpaceShip.set_data_3d(self.ksi, self.eta, self.zeta)
-        if current_step < self.K_stop_engine:
-            self.DrawedTraceEngineOn.set_data_3d(self.TraceKSI, self.TraceETA, self.TraceZETA)
-        else:
-            self.DrawedTrace.set_data_3d(self.TraceKSI[self.K_stop_engine:], self.TraceETA[self.K_stop_engine:], self.TraceZETA[self.K_stop_engine:])
 
-        Fx_dv_vs_Earth = self.F_dv * self.Vksi /(sp.sqrt(self.Vksi**2 + self.Veta**2))  # Сила x двигателя направленная против земли
-        Fy_dv_vs_Earth = self.F_dv * self.Veta /(sp.sqrt(self.Vksi**2 + self.Veta**2))  # Сила y двигателя направленная против земли
+        TraceKSI_ = []
+        TraceETA_ = []
+        TraceZETA_ = []
 
+        TraceKSI_m = []
+        TraceETA_m = []
+        TraceZETA_m = []
+
+        TraceKSI_2 = []
+        TraceETA_2 = []
+        TraceZETA_2 = []
+
+        TraceKSI_2m = []
+        TraceETA_2m = []
+        TraceZETA_2m = []
+
+        TraceKSI_.extend(self.TraceKSI[steps_with_engine_on[0]['start']:steps_with_engine_on[0]['stop']])
+        TraceETA_.extend(self.TraceETA[steps_with_engine_on[0]['start']:steps_with_engine_on[0]['stop']])
+        TraceZETA_.extend(self.TraceZETA[steps_with_engine_on[0]['start']:steps_with_engine_on[0]['stop']])
+
+        TraceKSI_m.extend(self.TraceKSI[steps_with_engine_on[1]['start']:steps_with_engine_on[1]['stop']])
+        TraceETA_m.extend(self.TraceETA[steps_with_engine_on[1]['start']:steps_with_engine_on[1]['stop']])
+        TraceZETA_m.extend(self.TraceZETA[steps_with_engine_on[1]['start']:steps_with_engine_on[1]['stop']])
+
+        TraceKSI_2.extend(self.TraceKSI[steps_with_engine_on[0]['stop']:steps_with_engine_on[1]['start']])
+        TraceETA_2.extend(self.TraceETA[steps_with_engine_on[0]['stop']:steps_with_engine_on[1]['start']])
+        TraceZETA_2.extend(self.TraceZETA[steps_with_engine_on[0]['stop']:steps_with_engine_on[1]['start']])
+
+        TraceKSI_2m.extend(self.TraceKSI[steps_with_engine_on[1]['stop']:])
+        TraceETA_2m.extend(self.TraceETA[steps_with_engine_on[1]['stop']:])
+        TraceZETA_2m.extend(self.TraceZETA[steps_with_engine_on[1]['stop']:])
+
+        self.DrawedTraceEngineOn.set_data_3d(TraceKSI_, TraceETA_, TraceZETA_)
+        self.DrawedTraceEngineOnNearMoon.set_data_3d(TraceKSI_m, TraceETA_m, TraceZETA_m)
+
+        self.DrawedTraceAfterMoon.set_data_3d(TraceKSI_2m, TraceETA_2m, TraceZETA_2m)
+        self.DrawedTrace.set_data_3d(TraceKSI_2, TraceETA_2, TraceZETA_2)
+
+
+        # Fx_dv_vs_Earth = self.F_dv * self.Vksi /(sp.sqrt(self.Vksi**2 + self.Veta**2))  # Сила x двигателя направленная против земли
+        # Fy_dv_vs_Earth = self.F_dv * self.Veta /(sp.sqrt(self.Vksi**2 + self.Veta**2))  # Сила y двигателя направленная против земли
         # self.DrawedSpaceShipFlame.set_data_3d(self.ksi + np.array([self.ksi, Fx_dv_vs_Earth]), self.eta + np.array([self.eta, Fy_dv_vs_Earth]), self.zeta)
 
 
