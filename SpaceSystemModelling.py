@@ -6,9 +6,14 @@ from matplotlib.animation import FuncAnimation
 class SpaceSystemModelling:
 	def HereAreWeGo(self, is_draw_only_trajectory=False):
 		def NewPoints(i):
-			global traj, flag, t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
-			
-			t += 36000*dt
+			global flag, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+
+
+			if(len(ksi) > 1):
+				rast = np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2 +(zeta_Sh - zeta[1])**2)
+				if(rast < 1):
+					dt = 0.0001
+
 
 			#Методом Рунге - Кутты
 			Dksi1, Deta1,Dzeta1, DVksi1, DVeta1,DVzeta1 = plSystem.SpaceBodyMoveEquations(ksi, eta, zeta, Vksi, Veta,Vzeta)
@@ -114,19 +119,20 @@ class SpaceSystemModelling:
 			if(is_draw_only_trajectory):
 			    print(f'[x] ', i, plSystem.spaceShip.ksi, plSystem.spaceShip.eta, plSystem.spaceShip.zeta, Vksi_Sh, Veta_Sh)
 			    plSystem.replace_system_without_draw(ksi, eta, zeta, Vksi, Veta,Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh)
-			    traj.append([plSystem.spaceShip.ksi, plSystem.spaceShip.ksi, plSystem.spaceShip.ksi])
 			else:
 				# print(f'[x] ', i, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh)
-				print(f'[moon] ', i, ksi, eta, Vksi, Veta)
-				plSystem.replace_system(ksi, eta, zeta, Vksi, Veta, Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh)
+				print(f'[moon] ', i, ksi[1], eta[1], Vksi[1], Veta[1])
+				plSystem.replace_system(ksi, eta, zeta, Vksi, Veta, Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, i)
 				drPlanets = [planet.DrawedPlanet for planet in plSystem.planets]
 				drTraces = [planet.DrawedTrace for planet in plSystem.planets]
 				return  [plSystem.spaceShip.DrawedSpaceShip]\
-				       + drTraces+drPlanets+ [plSystem.spaceShip.DrawedTrace]
+				       + drTraces+drPlanets + [plSystem.spaceShip.DrawedTraceEngineOn] + [plSystem.spaceShip.DrawedTrace] \
+				       # + [plSystem.spaceShip.DrawedSpaceShipFlame]
+			# self.SpWidget.canvas.axes.axis('scaled')
+			# self.SpWidget.canvas.axes.set(xlim=[Side+ksi_Sh, Side+ksi_Sh], ylim=[-Side+eta_Sh, Side+eta_Sh])
 
 
-		global traj, flag, t, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
-		t = 0.0
+		global flag, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
 		flag = False
 
 		#     Параметры массы
@@ -175,7 +181,7 @@ class SpaceSystemModelling:
 		# ===================== Просчитываем траектории полета и получаем вектора ======================= #
 		if((len(plSystem.planets) > 0 and hasattr(plSystem, "spaceShip")) or True): # Убрать TRUE
 		    plSystem.get_move_equations(False)
-		    ksi,eta,zeta, Vksi, Veta,Vzeta = plSystem.get_state_vectors()
+		    ksi, eta, zeta, Vksi, Veta,Vzeta = plSystem.get_state_vectors()
 		    ksi_Sh = plSystem.spaceShip.ksi
 		    eta_Sh = plSystem.spaceShip.eta
 		    zeta_Sh = plSystem.spaceShip.zeta
@@ -194,7 +200,6 @@ class SpaceSystemModelling:
 			dt = 0.01
 			cnt = 0
 			max_cnt = int(self.K_step_model.text())
-			traj = []
 			while cnt != max_cnt:
 			    NewPoints(cnt)
 			    cnt+=1
@@ -204,14 +209,15 @@ class SpaceSystemModelling:
 
 
 		Side = float(self.K_field.text()) # Сторона графика. С помощью нее можно увеличить графики
-		self.SpWidget.canvas.axes.set(xlim=[-Side, Side], ylim=[-Side, Side], zlim=[-Side, Side])
+		self.SpWidget.canvas.axes.set(xlim=[-4.6, -3.7], ylim=[4.8, 3.9], zlim=[-Side, Side])
 		self.SpWidget.canvas.axes.set_title('Это космос')
 		self.SpWidget.canvas.axes.set_xlabel('X')
 		self.SpWidget.canvas.axes.set_ylabel('Y')
 		self.SpWidget.canvas.axes.set_zlabel('Z')
 
 		if(is_draw_only_trajectory):
-			self.SpWidget.canvas.axes.plot(plSystem.spaceShip.TraceKSI, plSystem.spaceShip.TraceETA, plSystem.spaceShip.TraceZETA, ':')
+			self.SpWidget.canvas.axes.plot(plSystem.spaceShip.TraceKSI[K_stop_engine:], plSystem.spaceShip.TraceETA[K_stop_engine:], plSystem.spaceShip.TraceZETA[K_stop_engine:], ':', color='blue')
+			self.SpWidget.canvas.axes.plot(plSystem.spaceShip.TraceKSI[:K_stop_engine], plSystem.spaceShip.TraceETA[:K_stop_engine], plSystem.spaceShip.TraceZETA[:K_stop_engine], ':', color='red')
 		else:
 			plSystem.draw(self.SpWidget.canvas.axes)
 

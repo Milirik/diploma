@@ -18,13 +18,13 @@ class PlanetSystem():
     def add_spaceship(self, spaceShip):
         self.spaceShip = spaceShip
 
-    def replace_system(self, KSI, ETA, ZETA, VKSI, VETA, VZETA, KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, Phi_Sh=0, F_curr=0):
+    def replace_system(self, KSI, ETA, ZETA, VKSI, VETA, VZETA, KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, current_step, Phi_Sh=0, F_curr=0):
         for planet, ksi, eta, zeta, vksi, veta, vzeta in zip(self.planets, KSI, ETA, ZETA, VKSI, VETA, VZETA):
             planet.replace(ksi, eta, zeta, vksi, veta, vzeta)
             planet.re_draw()
         if (self.spaceShip):
             self.spaceShip.replace(KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, Phi_Sh, F_curr)
-            self.spaceShip.re_draw()
+            self.spaceShip.re_draw(current_step)
 
     def replace_system_without_draw(self, KSI, ETA, ZETA, VKSI, VETA, VZETA, KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, Phi_Sh=0, F_curr=0):
         for planet, ksi, eta, zeta, vksi, veta, vzeta in zip(self.planets, KSI, ETA, ZETA, VKSI, VETA, VZETA):
@@ -118,8 +118,8 @@ class PlanetSystem():
             if(obnul):
                 Fx_dv_vs_Earth = 0
                 Fy_dv_vs_Earth = 0
-            print(f'[xF] Fx_dv_vs_Earth', Fx_dv_vs_Earth)
-            print(f'[xF] Fy_dv_vs_Earth', Fy_dv_vs_Earth)
+            # print(f'[xF] Fx_dv_vs_Earth', Fx_dv_vs_Earth)
+            # print(f'[xF] Fy_dv_vs_Earth', Fy_dv_vs_Earth)
 
 
             DVKSI_Sh = sum([
@@ -237,9 +237,6 @@ class SpaceShip():
         self.SpaceShipY = self.eta
         self.SpaceShipZ = self.zeta
 
-        self.SpaceShipFlameX = self.R * np.array([0, 1])
-        self.SpaceShipFlameY = self.R * np.array([0, 1])
-
         self.TraceKSI = np.array([self.ksi])
         self.TraceETA = np.array([self.eta])
         self.TraceZETA = np.array([self.zeta])
@@ -260,38 +257,26 @@ class SpaceShip():
 
     def draw(self, axes):
         self.DrawedSpaceShip = axes.plot(self.ksi, self.eta, self.zeta,marker='o',markersize=1, color=self.color)[0]
-        self.DrawedSpaceShipFlame = axes.plot(self.ksi + self.SpaceShipFlameX, self.eta + self.SpaceShipFlameY, self.zeta, color='yellow')[0]
-        self.DrawedTrace = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA,':')[0]
+        self.DrawedSpaceShipFlame = axes.plot(self.ksi, self.eta, self.zeta, color='orange')[0]
+        
 
-    def re_draw(self):
-        #RotSpaceShipKSI, RotSpaceShipETA = rot_2D(self.SpaceShipKSI, self.SpaceShipETA, self.phi)
+        self.DrawedTrace = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='blue')[0]
+        self.DrawedTraceEngineOn = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='red')[0]
+
+
+    def re_draw(self, current_step):
+
         self.DrawedSpaceShip.set_data_3d(self.ksi, self.eta, self.zeta)
-        self.DrawedTrace.set_data_3d(self.TraceKSI, self.TraceETA,self.TraceZETA)
+        if current_step < self.K_stop_engine:
+            self.DrawedTraceEngineOn.set_data_3d(self.TraceKSI, self.TraceETA, self.TraceZETA)
+        else:
+            self.DrawedTrace.set_data_3d(self.TraceKSI[self.K_stop_engine:], self.TraceETA[self.K_stop_engine:], self.TraceZETA[self.K_stop_engine:])
 
-        RotSpaceShipFlameX, RotSpaceShipFlameY = rot_2D(self.ksi, self.eta, self.phi)
-        self.DrawedSpaceShipFlame.set_data_3d(self.ksi + RotSpaceShipFlameX, self.eta + RotSpaceShipFlameY, self.zeta)
+        Fx_dv_vs_Earth = self.F_dv * self.Vksi /(sp.sqrt(self.Vksi**2 + self.Veta**2))  # Сила x двигателя направленная против земли
+        Fy_dv_vs_Earth = self.F_dv * self.Veta /(sp.sqrt(self.Vksi**2 + self.Veta**2))  # Сила y двигателя направленная против земли
 
+        # self.DrawedSpaceShipFlame.set_data_3d(self.ksi + np.array([self.ksi, Fx_dv_vs_Earth]), self.eta + np.array([self.eta, Fy_dv_vs_Earth]), self.zeta)
 
-
-def rot_2D(KSI,ETA,phi):
-    RotKSI = KSI*np.cos(phi) - ETA*np.sin(phi)
-    RotETA = KSI*np.sin(phi) + ETA*np.cos(phi)
-    return RotKSI, RotETA
-
-
-def rot_3D(X, Y, Z, phi):
-    rotateX = np.array([[1, 0, 0, 0], [0, np.cos(phi), np.sin(phi), 0], [0, -np.sin(phi), np.cos(phi), 0], [0, 0, 0, 1]])
-    rotateY = np.array([[np.cos(phi), 0, np.sin(phi), 0], [0, 1, 0, 0], [-np.sin(phi), 0, np.cos(phi), 0], [0, 0, 0, 1]])
-    rotateZ = np.array([[np.cos(phi), -np.sin(phi), 0, 0], [np.sin(phi), np.cos(phi), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
-    rotate = rotateX * rotateY * rotateZ
-
-    tmpArray = np.array([X, Y, Z, 1])
-    tmp2 = rotate * tmpArray
-    RotX = tmp2[0][0]
-    RotY = tmp2[1][0]
-    RotZ = tmp2[2][0]
-
-    return RotX, RotY, RotZ
 
 def draw_the_space(axes):
     axes.fill([-100, 100, 100, - 100], [-100, - 100, 100, 100], 'black')
