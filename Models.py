@@ -109,8 +109,8 @@ class PlanetSystem():
             Beta = sp.symbols('beta')
 
 
-            DKSI_Sh =VKSI_Sh
-            DETA_Sh =VETA_Sh
+            DKSI_Sh = VKSI_Sh
+            DETA_Sh = VETA_Sh
             DZETA_Sh = VZETA_Sh
 
            
@@ -138,7 +138,7 @@ class PlanetSystem():
             DVZETA_Sh = sum([
                 (planet.k * (zeta - ZETA_Sh)) /  (sp.sqrt((ksi - KSI_Sh) ** 2 + (eta - ETA_Sh) ** 2 + (zeta - ZETA_Sh) ** 2) ** 3)
                 for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
-            ]) #+ F_dv / self.spaceShip.m * sp.sin(Beta)
+            ])
 
         self.SpaceShipMoveEquations = sp.lambdify(
             [KSI_Sh, ETA_Sh, ZETA_Sh, VKSI_Sh, VETA_Sh, VZETA_Sh, KSI, ETA, ZETA, VKSI, VETA, VZETA, F_dv, Alpha,Beta],
@@ -310,9 +310,9 @@ class SpaceShip():
         self.DrawedTrace.set_data_3d(TraceKSI_2, TraceETA_2, TraceZETA_2)
 
 
-        # Fx_dv_vs_Earth = self.F_dv * self.Vksi /(sp.sqrt(self.Vksi**2 + self.Veta**2))  # Сила x двигателя направленная против земли
-        # Fy_dv_vs_Earth = self.F_dv * self.Veta /(sp.sqrt(self.Vksi**2 + self.Veta**2))  # Сила y двигателя направленная против земли
-        # self.DrawedSpaceShipFlame.set_data_3d(self.ksi + np.array([self.ksi, Fx_dv_vs_Earth]), self.eta + np.array([self.eta, Fy_dv_vs_Earth]), self.zeta)
+        Fx_dv_vs_Earth = self.F_dv * self.Vksi /(sp.sqrt(self.Vksi**2 + self.Veta**2))  # Сила x двигателя направленная против земли
+        Fy_dv_vs_Earth = self.F_dv * self.Veta /(sp.sqrt(self.Vksi**2 + self.Veta**2))  # Сила y двигателя направленная против земли
+        self.DrawedSpaceShipFlame.set_data_3d(np.array([self.ksi, self.ksi + Fx_dv_vs_Earth * 100]), np.array([self.eta, self.eta + Fy_dv_vs_Earth * 100]), self.zeta)
 
 
 def draw_the_space(axes):

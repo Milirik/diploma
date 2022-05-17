@@ -9,11 +9,11 @@ class SpaceSystemModelling:
 		pass
 
 	def load_info(self):
-		print(self.moveDataVelocity)
+		print(self.moveDataCoordinates)
 		self.is_load = True
 		name_value = f'DataForAnalysis'
 		with open(f"./data_for_analysis/{name_value}.json", "w") as write_file:
-			json.dump([self.moveDataVelocity], write_file)
+			json.dump([self.moveDataCoordinates], write_file)
 
 
 	def HereAreWeGo(self, is_draw_only_trajectory=False):
@@ -21,16 +21,26 @@ class SpaceSystemModelling:
 			'Vx': [],
 			'Vy': []
 		}
+
+		self.moveDataCoordinates = {
+			'x': [],
+			'y': [],
+			't': [],
+			'V': []
+		}
+
+
 		self.is_load = False
 
 		def NewPoints(i):
-			global OnOffEngine, flag, flag2, flag3, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+			global max_cnt, t, OnOffEngine, flag, flag2, flag3, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
 
+			t += dt
 
-			if(len(ksi) > 0.1):
+			if(len(ksi) > 1):
 				rast = np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2 +(zeta_Sh - zeta[1])**2)
 				if(rast < 1):
-					dt = 0.0001
+					dt = 0.001
 
 
 			#Методом Рунге - Кутты
@@ -128,14 +138,21 @@ class SpaceSystemModelling:
 
 
 
-			# try:
-			# 	self.moveDataVelocity['Vx'].append({'i': i, 'Vx': Vksi[1]})
-			# 	self.moveDataVelocity['Vy'].append({'i': i, 'Vy': Veta[1]})
+			try:
+				# self.moveDataVelocity['Vx'].append({'i': i, 'Vx': Vksi[1]})
+				# self.moveDataVelocity['Vy'].append({'i': i, 'Vy': Veta[1]})
 
-			# 	if(i > 18194 and not self.is_load):
-			# 		self.load_info()
-			# except:
-			# 	print('Ошибка в запоминании данных')
+				self.moveDataCoordinates['x'].append(ksi_Sh)
+				self.moveDataCoordinates['y'].append(eta_Sh)
+				self.moveDataCoordinates['t'].append(i)
+				self.moveDataCoordinates['V'].append(np.sqrt(Vksi_Sh**2 + Veta_Sh**2))
+
+
+				if(i > max_cnt-2 and not self.is_load): #
+					self.load_info()
+					print('ok')
+			except:
+				print('Ошибка в запоминании данных')
 
 
 
@@ -155,7 +172,7 @@ class SpaceSystemModelling:
 
 
 			if(is_draw_only_trajectory):
-			    print(f'[x] ', i, plSystem.spaceShip.ksi, plSystem.spaceShip.eta, plSystem.spaceShip.zeta, Vksi_Sh, Veta_Sh)
+			    # print(f'[x] ', i, plSystem.spaceShip.ksi, plSystem.spaceShip.eta, plSystem.spaceShip.zeta, Vksi_Sh, Veta_Sh)
 			    plSystem.replace_system_without_draw(ksi, eta, zeta, Vksi, Veta,Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh)
 			else:
 				steps_with_engine_on = OnOffEngine
@@ -163,19 +180,21 @@ class SpaceSystemModelling:
 				# 	steps_with_engine_on.extend(list(range(k['start'], k['stop'])))
 
 				# print(f'[x] ', i, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh)
-				print(f'[moon] ', i, ksi[1], eta[1], Vksi[1], Veta[1])
+				# print(f'[moon] ', i, ksi[1], eta[1], Vksi[1], Veta[1])
 				plSystem.replace_system(ksi, eta, zeta, Vksi, Veta, Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, i, steps_with_engine_on)
 				drPlanets = [planet.DrawedPlanet for planet in plSystem.planets]
 				drTraces = [planet.DrawedTrace for planet in plSystem.planets]
 				return  [plSystem.spaceShip.DrawedSpaceShip]\
 				       + drTraces+drPlanets + [plSystem.spaceShip.DrawedTraceEngineOn] + [plSystem.spaceShip.DrawedTraceEngineOnNearMoon] + [plSystem.spaceShip.DrawedTraceAfterMoon] + [plSystem.spaceShip.DrawedTrace] \
-				       # + [plSystem.spaceShip.DrawedSpaceShipFlame]
+				       + [plSystem.spaceShip.DrawedSpaceShipFlame]
 
 
 
 
 
-		global OnOffEngine, flag, flag2, flag3, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+		global max_cnt, t, OnOffEngine, flag, flag2, flag3, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+		t = 0
+
 		flag = False
 		flag2 = False
 		flag3 = False
@@ -226,7 +245,7 @@ class SpaceSystemModelling:
 		OnOffEngine = [
 			{'start': 0, 'stop': int(K_stop_engine_), 'is_started': False, 'is_stoped': False},
 			# {'start': 7900, 'stop': int(8000), 'is_started': False, 'is_stoped': False}
-			{'start': 20000, 'stop': int(35000), 'is_started': False, 'is_stoped': False}
+			{'start': 100000, 'stop': int(200000), 'is_started': False, 'is_stoped': False}
 
 		]
 
