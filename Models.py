@@ -306,7 +306,6 @@ class SpaceShip():
 
         self.DrawedTraceEngineOn.set_data_3d(TraceKSI_, TraceETA_, TraceZETA_)
         self.DrawedTraceEngineOnNearMoon.set_data_3d(TraceKSI_m, TraceETA_m, TraceZETA_m)
-
         self.DrawedTraceAfterMoon.set_data_3d(TraceKSI_2m, TraceETA_2m, TraceZETA_2m)
         self.DrawedTrace.set_data_3d(TraceKSI_2, TraceETA_2, TraceZETA_2)
 

@@ -27,10 +27,10 @@ class SpaceSystemModelling:
 			global OnOffEngine, flag, flag2, flag3, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
 
 
-			# if(len(ksi) > 0.2):
-			# 	rast = np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2 +(zeta_Sh - zeta[1])**2)
-			# 	if(rast < 1):
-			# 		dt = 0.0001
+			if(len(ksi) > 0.1):
+				rast = np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2 +(zeta_Sh - zeta[1])**2)
+				if(rast < 1):
+					dt = 0.0001
 
 
 			#Методом Рунге - Кутты
@@ -128,14 +128,14 @@ class SpaceSystemModelling:
 
 
 
-			try:
-				self.moveDataVelocity['Vx'].append({'i': i, 'Vx': Vksi[1]})
-				self.moveDataVelocity['Vy'].append({'i': i, 'Vy': Veta[1]})
+			# try:
+			# 	self.moveDataVelocity['Vx'].append({'i': i, 'Vx': Vksi[1]})
+			# 	self.moveDataVelocity['Vy'].append({'i': i, 'Vy': Veta[1]})
 
-				if(i > 18194 and not self.is_load):
-					self.load_info()
-			except:
-				print('Ошибка в запоминании данных')
+			# 	if(i > 18194 and not self.is_load):
+			# 		self.load_info()
+			# except:
+			# 	print('Ошибка в запоминании данных')
 
 
 
@@ -168,7 +168,7 @@ class SpaceSystemModelling:
 				drPlanets = [planet.DrawedPlanet for planet in plSystem.planets]
 				drTraces = [planet.DrawedTrace for planet in plSystem.planets]
 				return  [plSystem.spaceShip.DrawedSpaceShip]\
-				       + drTraces+drPlanets + [plSystem.spaceShip.DrawedTraceEngineOn] + [plSystem.spaceShip.DrawedTraceEngineOnNearMoon] + [plSystem.spaceShip.DrawedTraceAfterMoon] + [plSystem.spaceShip.DrawedTrace] # \
+				       + drTraces+drPlanets + [plSystem.spaceShip.DrawedTraceEngineOn] + [plSystem.spaceShip.DrawedTraceEngineOnNearMoon] + [plSystem.spaceShip.DrawedTraceAfterMoon] + [plSystem.spaceShip.DrawedTrace] \
 				       # + [plSystem.spaceShip.DrawedSpaceShipFlame]
 
 
@@ -225,7 +225,9 @@ class SpaceSystemModelling:
 
 		OnOffEngine = [
 			{'start': 0, 'stop': int(K_stop_engine_), 'is_started': False, 'is_stoped': False},
-			{'start': 7900, 'stop': int(8000), 'is_started': False, 'is_stoped': False}
+			# {'start': 7900, 'stop': int(8000), 'is_started': False, 'is_stoped': False}
+			{'start': 20000, 'stop': int(35000), 'is_started': False, 'is_stoped': False}
+
 		]
 
 
@@ -268,8 +270,49 @@ class SpaceSystemModelling:
 		self.SpWidget.canvas.axes.set_zlabel('Z')
 
 		if(is_draw_only_trajectory):
-			self.SpWidget.canvas.axes.plot(plSystem.spaceShip.TraceKSI[K_stop_engine:], plSystem.spaceShip.TraceETA[K_stop_engine:], plSystem.spaceShip.TraceZETA[K_stop_engine:], ':', color='blue')
-			self.SpWidget.canvas.axes.plot(plSystem.spaceShip.TraceKSI[:K_stop_engine], plSystem.spaceShip.TraceETA[:K_stop_engine], plSystem.spaceShip.TraceZETA[:K_stop_engine], ':', color='red')
+
+
+			TraceKSI_ = []
+			TraceETA_ = []
+			TraceZETA_ = []
+
+			TraceKSI_m = []
+			TraceETA_m = []
+			TraceZETA_m = []
+
+			TraceKSI_2 = []
+			TraceETA_2 = []
+			TraceZETA_2 = []
+
+			TraceKSI_2m = []
+			TraceETA_2m = []
+			TraceZETA_2m = []
+
+			TraceKSI_.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[0]['start']:OnOffEngine[0]['stop']])
+			TraceETA_.extend(plSystem.spaceShip.TraceETA[OnOffEngine[0]['start']:OnOffEngine[0]['stop']])
+			TraceZETA_.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[0]['start']:OnOffEngine[0]['stop']])
+
+			TraceKSI_m.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[1]['start']:OnOffEngine[1]['stop']])
+			TraceETA_m.extend(plSystem.spaceShip.TraceETA[OnOffEngine[1]['start']:OnOffEngine[1]['stop']])
+			TraceZETA_m.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[1]['start']:OnOffEngine[1]['stop']])
+
+			TraceKSI_2.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[0]['stop']:OnOffEngine[1]['start']])
+			TraceETA_2.extend(plSystem.spaceShip.TraceETA[OnOffEngine[0]['stop']:OnOffEngine[1]['start']])
+			TraceZETA_2.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[0]['stop']:OnOffEngine[1]['start']])
+
+			TraceKSI_2m.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[1]['stop']:])
+			TraceETA_2m.extend(plSystem.spaceShip.TraceETA[OnOffEngine[1]['stop']:])
+			TraceZETA_2m.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[1]['stop']:])
+
+			self.SpWidget.canvas.axes.plot(TraceKSI_, TraceETA_, TraceZETA_, ':', color='red')
+			self.SpWidget.canvas.axes.plot(TraceKSI_m, TraceETA_m, TraceZETA_m, ':', color='red')
+			self.SpWidget.canvas.axes.plot(TraceKSI_2m, TraceETA_2m, TraceZETA_2m, ':', color='blue')
+			self.SpWidget.canvas.axes.plot(TraceKSI_2, TraceETA_2, TraceZETA_2, ':', color='blue')
+
+
+
+			# self.SpWidget.canvas.axes.plot(plSystem.spaceShip.TraceKSI[K_stop_engine:], plSystem.spaceShip.TraceETA[K_stop_engine:], plSystem.spaceShip.TraceZETA[K_stop_engine:], ':', color='blue')
+			# self.SpWidget.canvas.axes.plot(plSystem.spaceShip.TraceKSI[:K_stop_engine], plSystem.spaceShip.TraceETA[:K_stop_engine], plSystem.spaceShip.TraceZETA[:K_stop_engine], ':', color='red')
 		else:
 			plSystem.draw(self.SpWidget.canvas.axes)
 
