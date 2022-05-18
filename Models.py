@@ -114,25 +114,27 @@ class PlanetSystem():
             DZETA_Sh = VZETA_Sh
 
            
-            if(not is_on):
-                Fx_dv_vs_Earth = 0
-                Fy_dv_vs_Earth = 0
+            if(is_on):
                 Fx_dv_vs_Moon = 0
                 Fy_dv_vs_Moon = 0
+                Fx_dv_vs_Earth = F_dv * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила x двигателя направленная против земли
+                Fy_dv_vs_Earth = F_dv * VETA_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила y двигателя направленная против земли
             elif(is_near_moon):
-                r = [ksi_Sh - ksi[1], eta_Sh - eta[1]]
-                Vfi = (Vksi_Sh * r[1] - Veta_Sh * r[0]) / np.sqrt(r[0]**2 + r[1]**2)
-                F = Vfi**2/np.sqrt(r[0]**2 + r[1]**2)
+                r = [KSI_Sh - KSI[1], ETA_Sh - ETA[1]]
+                Vfi = (VKSI_Sh * r[1] - VETA_Sh * r[0]) / sp.sqrt(r[0]**2 + r[1]**2)
+                F = Vfi**2/sp.sqrt(r[0]**2 + r[1]**2)
 
                 Fx_dv_vs_Earth = 0
                 Fy_dv_vs_Earth = 0
                 Fx_dv_vs_Moon = F * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))
                 Fy_dv_vs_Moon = F * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))
+                print('[x] Fx_dv_vs_Moon', Fx_dv_vs_Moon)
             else:
+                Fx_dv_vs_Earth = 0
+                Fy_dv_vs_Earth = 0
                 Fx_dv_vs_Moon = 0
                 Fy_dv_vs_Moon = 0
-                Fx_dv_vs_Earth = F_dv * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила x двигателя направленная против земли
-                Fy_dv_vs_Earth = F_dv * VETA_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила y двигателя направленная против земли
+                
 
             print(f'[!] Fx_dv_vs_Earth', Fx_dv_vs_Earth)
             print(f'[!] Fy_dv_vs_Earth', Fy_dv_vs_Earth)
@@ -141,12 +143,12 @@ class PlanetSystem():
             DVKSI_Sh = sum([
                 (planet.k * (ksi - KSI_Sh)) / (sp.sqrt((ksi - KSI_Sh) ** 2 + (eta - ETA_Sh) ** 2 + (zeta - ZETA_Sh) ** 2) ** 3)
                 for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
-            ]) + Fx_dv_vs_Earth
+            ]) + Fx_dv_vs_Earth + Fx_dv_vs_Moon
 
             DVETA_Sh = sum([
                 (planet.k * (eta - ETA_Sh)) / (sp.sqrt((ksi - KSI_Sh) ** 2 + (eta - ETA_Sh) ** 2 + (zeta - ZETA_Sh) ** 2) ** 3)
                 for ksi, eta, zeta, planet in zip(KSI, ETA, ZETA, self.planets)
-            ]) + Fy_dv_vs_Earth
+            ]) + Fy_dv_vs_Earth + Fy_dv_vs_Moon
 
             DVZETA_Sh = sum([
                 (planet.k * (zeta - ZETA_Sh)) /  (sp.sqrt((ksi - KSI_Sh) ** 2 + (eta - ETA_Sh) ** 2 + (zeta - ZETA_Sh) ** 2) ** 3)

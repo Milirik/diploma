@@ -30,8 +30,7 @@ class SpaceSystemModelling:
 		self.is_load = False
 
 		def NewPoints(i):
-			global flagStartEngineMoon, max_cnt, t, OnOffEngine, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
-
+			global signVfi, flagStartEngineMoon, max_cnt, t, OnOffEngine, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
 			t += dt
 
 			if(len(ksi) > 1):
@@ -164,8 +163,9 @@ class SpaceSystemModelling:
 				print(f'[load] Error: Ошибка в запоминании данных - {e}')
 
 			# Включаем двигатель против Луны
-			print('[x] Vfi', Vfi)
-			if(Vfi == 0.0 and i > 8000 and not flagStartEngineMoon):
+
+			if(signVfi != (-1 if Vfi < 0 else 1) and i > 8000 and not flagStartEngineMoon):
+				print('hi')
 				plSystem.get_move_equations(False, True)
 				flagStartEngineMoon = True
 			# не когда равна нулю, а когда меняется знак
@@ -200,7 +200,9 @@ class SpaceSystemModelling:
 				       
 
 
-		global flagStartEngineMoon, max_cnt, t, OnOffEngine, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+		global signVfi, flagStartEngineMoon, max_cnt, t, OnOffEngine, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+		signVfi = 1
+
 		flagStartEngineMoon = False
 		t = 0
 		F_dv = 0

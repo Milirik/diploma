@@ -9,8 +9,8 @@ ax = fig.add_subplot(1, 1, 1)
 with open(os.path.abspath('.\\data_for_analysis\\' + 'DataForAnalysis.json') , "r") as read_file:
     fileData = json.load(read_file)
 
-# with open(os.path.abspath('.\\data_for_analysis\\' + 'DataForAnalysis_save.json') , "r") as read_file2:
-#     fileData2 = json.load(read_file2)
+with open(os.path.abspath('.\\data_for_analysis\\' + 'DataForAnalysis_without_engine_near_moon.json') , "r") as read_file2:
+    fileData2 = json.load(read_file2)
 
 
 # print('[V]', fileData[0]['V'][-1])
@@ -27,6 +27,10 @@ with open(os.path.abspath('.\\data_for_analysis\\' + 'DataForAnalysis.json') , "
 ax.plot(fileData[0]['t'], fileData[0]['Vr'], label='Vr')
 ax.plot(fileData[0]['t'], fileData[0]['Vfi'], label='Vfi')
 ax.plot(fileData[0]['t'], fileData[0]['w'], label='w')
+
+ax.plot(fileData2[0]['t'], fileData2[0]['Vr'], label='Vr')
+ax.plot(fileData2[0]['t'], fileData2[0]['Vfi'], label='Vfi')
+ax.plot(fileData2[0]['t'], fileData2[0]['w'], label='w')
 
 ax.legend()
 
