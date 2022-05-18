@@ -39,7 +39,7 @@ class PlanetSystem():
         if (self.spaceShip):
             self.spaceShip.draw(axes)
 
-    def get_move_equations(self, is_on):
+    def get_move_equations(self, is_on, is_near_moon=False):
         n = len(self.planets)
         _strKSI = ''
         _strETA = ''
@@ -117,12 +117,25 @@ class PlanetSystem():
             if(not is_on):
                 Fx_dv_vs_Earth = 0
                 Fy_dv_vs_Earth = 0
+                Fx_dv_vs_Moon = 0
+                Fy_dv_vs_Moon = 0
+            elif(is_near_moon):
+                r = [ksi_Sh - ksi[1], eta_Sh - eta[1]]
+                Vfi = (Vksi_Sh * r[1] - Veta_Sh * r[0]) / np.sqrt(r[0]**2 + r[1]**2)
+                F = Vfi**2/np.sqrt(r[0]**2 + r[1]**2)
+
+                Fx_dv_vs_Earth = 0
+                Fy_dv_vs_Earth = 0
+                Fx_dv_vs_Moon = F * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))
+                Fy_dv_vs_Moon = F * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))
             else:
+                Fx_dv_vs_Moon = 0
+                Fy_dv_vs_Moon = 0
                 Fx_dv_vs_Earth = F_dv * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила x двигателя направленная против земли
                 Fy_dv_vs_Earth = F_dv * VETA_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила y двигателя направленная против земли
 
-            print(f'[xF] Fx_dv_vs_Earth', Fx_dv_vs_Earth)
-            print(f'[xF] Fy_dv_vs_Earth', Fy_dv_vs_Earth)
+            print(f'[!] Fx_dv_vs_Earth', Fx_dv_vs_Earth)
+            print(f'[!] Fy_dv_vs_Earth', Fy_dv_vs_Earth)
 
 
             DVKSI_Sh = sum([
