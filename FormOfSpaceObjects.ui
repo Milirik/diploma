@@ -1403,7 +1403,7 @@ color: rgb(255, 255, 255);</string>
      </font>
     </property>
     <property name="text">
-     <string>0</string>
+     <string>1.054</string>
     </property>
     <property name="readOnly">
      <bool>false</bool>

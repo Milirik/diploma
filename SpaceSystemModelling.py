@@ -17,11 +17,6 @@ class SpaceSystemModelling:
 
 
 	def HereAreWeGo(self, is_draw_only_trajectory=False):
-		self.moveDataVelocity = {
-			'Vx': [],
-			'Vy': []
-		}
-
 		self.moveDataCoordinates = {
 			'x': [],
 			'y': [],
@@ -30,11 +25,10 @@ class SpaceSystemModelling:
 			'r': []
 		}
 
-
 		self.is_load = False
 
 		def NewPoints(i):
-			global max_cnt, t, OnOffEngine, flag, flag2, flag3, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+			global max_cnt, t, OnOffEngine, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
 
 			t += dt
 
@@ -42,7 +36,8 @@ class SpaceSystemModelling:
 				rast = np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2 +(zeta_Sh - zeta[1])**2)
 				if(rast < 1):
 					dt = 0.001
-
+				else:
+					dt = 0.01
 
 			#Методом Рунге - Кутты
 			Dksi1, Deta1,Dzeta1, DVksi1, DVeta1,DVzeta1 = plSystem.SpaceBodyMoveEquations(ksi, eta, zeta, Vksi, Veta,Vzeta)
@@ -138,17 +133,13 @@ class SpaceSystemModelling:
 			Vzeta_Sh = Vzeta_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
 
 
-
+			# Запись данных в файл для анализа
 			try:
-				# self.moveDataVelocity['Vx'].append({'i': i, 'Vx': Vksi[1]})
-				# self.moveDataVelocity['Vy'].append({'i': i, 'Vy': Veta[1]})
-
 				self.moveDataCoordinates['x'].append(ksi_Sh)
 				self.moveDataCoordinates['y'].append(eta_Sh)
 				self.moveDataCoordinates['t'].append(i)
 				self.moveDataCoordinates['V'].append(np.sqrt(Vksi_Sh**2 + Veta_Sh**2))
 				self.moveDataCoordinates['r'].append(np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2))
-
 
 
 				if(i > max_cnt-2 and not self.is_load): #
@@ -158,7 +149,7 @@ class SpaceSystemModelling:
 				print('Ошибка в запоминании данных')
 
 
-
+			# Включчение и выключение двигателя по шагу
 			for t in range(len(OnOffEngine)):
 				if(i > OnOffEngine[t]['start'] and not OnOffEngine[t]['is_started']):
 					print('On')
@@ -169,11 +160,11 @@ class SpaceSystemModelling:
 					plSystem.get_move_equations(False)
 					OnOffEngine[t]['is_stoped'] = True
 
-
+			# Отображение потраченного топлива
 			if(i <= int(K_stop_engine)):
 			    self.K_toplivo_out.setText(str(int(i*F_dv)))
 
-
+			# Изменение расположения объектов и ререндер
 			if(is_draw_only_trajectory):
 			    # print(f'[x] ', i, plSystem.spaceShip.ksi, plSystem.spaceShip.eta, plSystem.spaceShip.zeta, Vksi_Sh, Veta_Sh)
 			    plSystem.replace_system_without_draw(ksi, eta, zeta, Vksi, Veta,Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh)
@@ -187,39 +178,25 @@ class SpaceSystemModelling:
 				plSystem.replace_system(ksi, eta, zeta, Vksi, Veta, Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, i, steps_with_engine_on)
 				drPlanets = [planet.DrawedPlanet for planet in plSystem.planets]
 				drTraces = [planet.DrawedTrace for planet in plSystem.planets]
-				return  [plSystem.spaceShip.DrawedSpaceShip]\
-				       + drTraces+drPlanets + [plSystem.spaceShip.DrawedTraceEngineOn] + [plSystem.spaceShip.DrawedTraceEngineOnNearMoon] + [plSystem.spaceShip.DrawedTraceAfterMoon] + [plSystem.spaceShip.DrawedTrace] \
-				       + [plSystem.spaceShip.DrawedSpaceShipFlame]
+				return [plSystem.spaceShip.DrawedSpaceShip] + drTraces + drPlanets + [plSystem.spaceShip.DrawedTraceEngineOn] + [plSystem.spaceShip.DrawedTraceEngineOff] + [plSystem.spaceShip.DrawedSpaceShipFlame]
+				# + [plSystem.spaceShip.DrawedTraceAfterMoon] + 
+				# + [plSystem.spaceShip.DrawedTrace] + \
+				       
 
 
-
-
-
-		global max_cnt, t, OnOffEngine, flag, flag2, flag3, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+		global max_cnt, t, OnOffEngine, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
 		t = 0
-
-		flag = False
-		flag2 = False
-		flag3 = False
-
+		F_dv = 0
+		Alpha = 0
+		Beta = 0
 
 		#     Параметры массы
-		dt = float(self.TStep_field.text())
+		dt = float(self.TStep_field.text()) # Шаг интегрирования
+		phi = float(self.moonPhi.text()) # Фаза для Луны
 
-		# Было задано до этого
-		# F_max = plSystem.spaceShip.F_dv
-		# F_dv = self.F_Bar.value()*F_max/100
-		# Alpha = self.Angle_Bar.value()/360*6.28+1.57
-
-		F_dv = 0 #2500 # Сила двигателя
-		Alpha = 0 #360/24*(t+dt) # Направленнность
-		Beta = 0
 		
-
-
 		razm = 4.216424392e7 # Для обезразмеривания
 		koff = 7.29e-5 # Для обезразмеривания
-
 
 		plSystem = PlanetSystem([])
 		for i in self.fileData:
@@ -231,19 +208,22 @@ class SpaceSystemModelling:
 		        M = i["m"]
 		        color = i["color"]
 
-		        ki = 0.9999999998 if i["name"] == 'Earth' else 0.01232376679 # Для обезразмеривания
+		        if(i["name"] == 'Earth'):
+		        	ki = 0.9999999998 # Для обезразмеривания
+		        else:
+		        	# Key
+		        	ki = 0.01232376679 # Для обезразмеривания
+		        	ksi_1 = ksi_ * np.cos(phi) - eta_ * np.sin(phi)
+		        	eta_1 = ksi_ * np.sin(phi) + eta_ * np.cos(phi)
 
-		        phi = float(self.moonPhi.text())
-		        ksi_1 = ksi_ * np.cos(phi) - eta_ * np.sin(phi)
-		        eta_1 = ksi_ * np.sin(phi) + eta_ * np.cos(phi)
+		        	V_ksi1 = V_ksi * np.cos(phi) - V_eta * np.sin(phi)
+		        	V_eta1 = V_ksi * np.sin(phi) + V_eta * np.cos(phi)
 
-		        V_ksi1 = V_ksi * np.cos(phi) - V_eta * np.sin(phi)
-		        V_eta1 = V_ksi * np.sin(phi) + V_eta * np.cos(phi)
+		        	ksi_, eta_, V_ksi, V_eta = ksi_1, eta_1, V_ksi1, V_eta1
 
-		        ksi_ = ksi_1
-		        eta_ = eta_1
-		        V_ksi = V_ksi1
-		        V_eta = V_eta1
+
+		        
+
 
 		        plSystem.add_new_planet(Planet(ksi_, eta_, zeta_, V_ksi, V_eta, V_zeta, ki, M, R, color))
 		    else:
@@ -256,13 +236,8 @@ class SpaceSystemModelling:
 
 		        plSystem.add_spaceship(SpaceShip(ksi_, eta_, zeta_, V_ksi, V_eta, V_zeta, M, R, color, F_dv, K_stop_engine_))
 
-		# F_dv = 0 # Если убрать то будет норм двигатель работать для ракеты
-
 		OnOffEngine = [
 			{'start': 0, 'stop': int(K_stop_engine_), 'is_started': False, 'is_stoped': False},
-			# {'start': 7900, 'stop': int(8000), 'is_started': False, 'is_stoped': False}
-			{'start': 100000, 'stop': int(200000), 'is_started': False, 'is_stoped': False}
-
 		]
 
 
@@ -305,19 +280,17 @@ class SpaceSystemModelling:
 		self.SpWidget.canvas.axes.set_zlabel('Z')
 
 		if(is_draw_only_trajectory):
-
-
 			TraceKSI_ = []
 			TraceETA_ = []
 			TraceZETA_ = []
 
-			TraceKSI_m = []
-			TraceETA_m = []
-			TraceZETA_m = []
-
 			TraceKSI_2 = []
 			TraceETA_2 = []
 			TraceZETA_2 = []
+
+			TraceKSI_m = []
+			TraceETA_m = []
+			TraceZETA_m = []
 
 			TraceKSI_2m = []
 			TraceETA_2m = []
@@ -327,27 +300,28 @@ class SpaceSystemModelling:
 			TraceETA_.extend(plSystem.spaceShip.TraceETA[OnOffEngine[0]['start']:OnOffEngine[0]['stop']])
 			TraceZETA_.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[0]['start']:OnOffEngine[0]['stop']])
 
-			TraceKSI_m.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[1]['start']:OnOffEngine[1]['stop']])
-			TraceETA_m.extend(plSystem.spaceShip.TraceETA[OnOffEngine[1]['start']:OnOffEngine[1]['stop']])
-			TraceZETA_m.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[1]['start']:OnOffEngine[1]['stop']])
+			TraceKSI_2.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[0]['stop']:])
+			TraceETA_2.extend(plSystem.spaceShip.TraceETA[OnOffEngine[0]['stop']:])
+			TraceZETA_2.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[0]['stop']:])
 
-			TraceKSI_2.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[0]['stop']:OnOffEngine[1]['start']])
-			TraceETA_2.extend(plSystem.spaceShip.TraceETA[OnOffEngine[0]['stop']:OnOffEngine[1]['start']])
-			TraceZETA_2.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[0]['stop']:OnOffEngine[1]['start']])
+			# TraceKSI_m.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[1]['start']:OnOffEngine[1]['stop']])
+			# TraceETA_m.extend(plSystem.spaceShip.TraceETA[OnOffEngine[1]['start']:OnOffEngine[1]['stop']])
+			# TraceZETA_m.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[1]['start']:OnOffEngine[1]['stop']])
 
-			TraceKSI_2m.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[1]['stop']:])
-			TraceETA_2m.extend(plSystem.spaceShip.TraceETA[OnOffEngine[1]['stop']:])
-			TraceZETA_2m.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[1]['stop']:])
+			# TraceKSI_2.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[0]['stop']:OnOffEngine[1]['start']])
+			# TraceETA_2.extend(plSystem.spaceShip.TraceETA[OnOffEngine[0]['stop']:OnOffEngine[1]['start']])
+			# TraceZETA_2.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[0]['stop']:OnOffEngine[1]['start']])
+
+			# TraceKSI_2m.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[1]['stop']:])
+			# TraceETA_2m.extend(plSystem.spaceShip.TraceETA[OnOffEngine[1]['stop']:])
+			# TraceZETA_2m.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[1]['stop']:])
 
 			self.SpWidget.canvas.axes.plot(TraceKSI_, TraceETA_, TraceZETA_, ':', color='red')
-			self.SpWidget.canvas.axes.plot(TraceKSI_m, TraceETA_m, TraceZETA_m, ':', color='red')
-			self.SpWidget.canvas.axes.plot(TraceKSI_2m, TraceETA_2m, TraceZETA_2m, ':', color='blue')
 			self.SpWidget.canvas.axes.plot(TraceKSI_2, TraceETA_2, TraceZETA_2, ':', color='blue')
 
+			# self.SpWidget.canvas.axes.plot(TraceKSI_m, TraceETA_m, TraceZETA_m, ':', color='red')
+			# self.SpWidget.canvas.axes.plot(TraceKSI_2m, TraceETA_2m, TraceZETA_2m, ':', color='blue')
 
-
-			# self.SpWidget.canvas.axes.plot(plSystem.spaceShip.TraceKSI[K_stop_engine:], plSystem.spaceShip.TraceETA[K_stop_engine:], plSystem.spaceShip.TraceZETA[K_stop_engine:], ':', color='blue')
-			# self.SpWidget.canvas.axes.plot(plSystem.spaceShip.TraceKSI[:K_stop_engine], plSystem.spaceShip.TraceETA[:K_stop_engine], plSystem.spaceShip.TraceZETA[:K_stop_engine], ':', color='red')
 		else:
 			plSystem.draw(self.SpWidget.canvas.axes)
 

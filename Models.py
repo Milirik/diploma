@@ -262,11 +262,11 @@ class SpaceShip():
         self.DrawedSpaceShip = axes.plot(self.ksi, self.eta, self.zeta,marker='o',markersize=1, color=self.color)[0]
         self.DrawedSpaceShipFlame = axes.plot(self.ksi, self.eta, self.zeta, color='orange')[0]
         
-        self.DrawedTraceEngineOnNearMoon = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='red')[0]
         self.DrawedTraceEngineOn = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='red')[0]
+        self.DrawedTraceEngineOff = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='blue')[0]
 
-        self.DrawedTraceAfterMoon = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='blue')[0]
-        self.DrawedTrace = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='blue')[0]
+        # self.DrawedTraceAfterMoon = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='blue')[0]
+        # self.DrawedTrace = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='blue')[0]
 
 
     def re_draw(self, current_step, steps_with_engine_on):
@@ -292,22 +292,27 @@ class SpaceShip():
         TraceETA_.extend(self.TraceETA[steps_with_engine_on[0]['start']:steps_with_engine_on[0]['stop']])
         TraceZETA_.extend(self.TraceZETA[steps_with_engine_on[0]['start']:steps_with_engine_on[0]['stop']])
 
-        TraceKSI_m.extend(self.TraceKSI[steps_with_engine_on[1]['start']:steps_with_engine_on[1]['stop']])
-        TraceETA_m.extend(self.TraceETA[steps_with_engine_on[1]['start']:steps_with_engine_on[1]['stop']])
-        TraceZETA_m.extend(self.TraceZETA[steps_with_engine_on[1]['start']:steps_with_engine_on[1]['stop']])
+        TraceKSI_2.extend(self.TraceKSI[steps_with_engine_on[0]['stop']:])
+        TraceETA_2.extend(self.TraceETA[steps_with_engine_on[0]['stop']:])
+        TraceZETA_2.extend(self.TraceZETA[steps_with_engine_on[0]['stop']:])
 
-        TraceKSI_2.extend(self.TraceKSI[steps_with_engine_on[0]['stop']:steps_with_engine_on[1]['start']])
-        TraceETA_2.extend(self.TraceETA[steps_with_engine_on[0]['stop']:steps_with_engine_on[1]['start']])
-        TraceZETA_2.extend(self.TraceZETA[steps_with_engine_on[0]['stop']:steps_with_engine_on[1]['start']])
+        # TraceKSI_m.extend(self.TraceKSI[steps_with_engine_on[1]['start']:steps_with_engine_on[1]['stop']])
+        # TraceETA_m.extend(self.TraceETA[steps_with_engine_on[1]['start']:steps_with_engine_on[1]['stop']])
+        # TraceZETA_m.extend(self.TraceZETA[steps_with_engine_on[1]['start']:steps_with_engine_on[1]['stop']])
 
-        TraceKSI_2m.extend(self.TraceKSI[steps_with_engine_on[1]['stop']:])
-        TraceETA_2m.extend(self.TraceETA[steps_with_engine_on[1]['stop']:])
-        TraceZETA_2m.extend(self.TraceZETA[steps_with_engine_on[1]['stop']:])
+        # TraceKSI_2.extend(self.TraceKSI[steps_with_engine_on[0]['stop']:steps_with_engine_on[1]['start']])
+        # TraceETA_2.extend(self.TraceETA[steps_with_engine_on[0]['stop']:steps_with_engine_on[1]['start']])
+        # TraceZETA_2.extend(self.TraceZETA[steps_with_engine_on[0]['stop']:steps_with_engine_on[1]['start']])
+
+        # TraceKSI_2m.extend(self.TraceKSI[steps_with_engine_on[1]['stop']:])
+        # TraceETA_2m.extend(self.TraceETA[steps_with_engine_on[1]['stop']:])
+        # TraceZETA_2m.extend(self.TraceZETA[steps_with_engine_on[1]['stop']:])
 
         self.DrawedTraceEngineOn.set_data_3d(TraceKSI_, TraceETA_, TraceZETA_)
-        self.DrawedTraceEngineOnNearMoon.set_data_3d(TraceKSI_m, TraceETA_m, TraceZETA_m)
-        self.DrawedTraceAfterMoon.set_data_3d(TraceKSI_2m, TraceETA_2m, TraceZETA_2m)
-        self.DrawedTrace.set_data_3d(TraceKSI_2, TraceETA_2, TraceZETA_2)
+        self.DrawedTraceEngineOff.set_data_3d(TraceKSI_2, TraceETA_2, TraceZETA_2)
+
+        # self.DrawedTraceEngineOnNearMoon.set_data_3d(TraceKSI_m, TraceETA_m, TraceZETA_m)
+        # self.DrawedTraceAfterMoon.set_data_3d(TraceKSI_2m, TraceETA_2m, TraceZETA_2m)
 
 
         Fx_dv_vs_Earth = self.F_dv * self.Vksi /(sp.sqrt(self.Vksi**2 + self.Veta**2))  # Сила x двигателя направленная против земли

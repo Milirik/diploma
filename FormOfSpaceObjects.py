@@ -605,7 +605,7 @@ class Ui_MainWindow(object):
         self.K_step_model.setText(_translate("MainWindow", "15000"))
         self.ClearGraph.setText(_translate("MainWindow", "Очистить график"))
         self.label_14.setText(_translate("MainWindow", "Фаза луны"))
-        self.moonPhi.setText(_translate("MainWindow", "0"))
+        self.moonPhi.setText(_translate("MainWindow", "1.054"))
 from spacewidget import SpaceWidget
 
 
