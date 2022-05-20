@@ -37,7 +37,7 @@ with open(os.path.abspath('.\\data_for_analysis\\' + 'data_for_analysis_Мане
 
 # print('[V final empty]', fileDataEmpty[0]['V'][-1])
 # print('[V final without engine]', fileDataWithoutObert[0]['V'][-1])
-print('[V final with engine]', fileDataWithObert[0]['V'][-1])
+# print('[V final with engine]', fileDataWithObert[0]['V'][-1])
 
 # ax.plot(fileDataEmpty[0]['t'], fileDataEmpty[0]['V'], label='V_empty')
 # ax.plot(fileDataWithoutObert[0]['t'], fileDataWithoutObert[0]['V'], label='V_without_Obert')
@@ -55,8 +55,9 @@ print('[V final with engine]', fileDataWithObert[0]['V'][-1])
 
 
 
-# ax.plot(fileData[0]['x'], fileData[0]['y'], marker='o')
-# ax.plot(fileData2[0]['x'], fileData2[0]['y'], marker='o', color='red')
+ax.plot(fileDataEmpty[0]['x'], fileDataEmpty[0]['y'], marker='o', label='fileDataEmpty')
+ax.plot(fileDataWithoutObert[0]['x'], fileDataWithoutObert[0]['y'], marker='o',  label='fileDataWithoutObert')
+ax.plot(fileDataWithObert[0]['x'], fileDataWithObert[0]['y'], marker='o', label='fileDataWithObert')
 
 
 # ax.plot(fileData[0]['t'], fileData[0]['Vr'], label='Vr')
