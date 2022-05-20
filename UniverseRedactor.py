@@ -101,8 +101,16 @@ class SpaceWidget(QMainWindow, FormOfSpaceObjects.Ui_MainWindow, SpaceSystemMode
             print(f'[x] Файл {thisFile} не удалось удалить')
 
     def start_simulation(self, is_draw_only_trajectory):
-        if(is_draw_only_trajectory): self.HereAreWeGo(is_draw_only_trajectory)
-        else: self.HereAreWeGo()
+        if(is_draw_only_trajectory): 
+
+            # for i in range(-10, 10):
+            #     k = i/10                
+            #     print('shag - ', k)
+            #     self.HereAreWeGo(is_draw_only_trajectory, k)
+            self.HereAreWeGo(is_draw_only_trajectory)
+
+        else: 
+            self.HereAreWeGo()
 
     def stop_simulation(self):
         self.animation.event_source.stop()

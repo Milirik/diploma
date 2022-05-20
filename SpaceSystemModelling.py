@@ -16,7 +16,8 @@ class SpaceSystemModelling:
 			json.dump([self.moveDataCoordinates], write_file)
 
 
-	def HereAreWeGo(self, is_draw_only_trajectory=False):
+
+	def HereAreWeGo(self, is_draw_only_trajectory=False, shag=0.0):
 		self.moveDataCoordinates = {
 			'x': [],
 			'y': [],
@@ -27,13 +28,14 @@ class SpaceSystemModelling:
 			'Vr': [],
 			'Vfi': [],
 			'w': [],
-			'R_earth_spitnik': []
+			'R_earth_spitnik': [],
+			'vklObert': []
 		}
 
 		self.is_load = False
 
 		def NewPoints(i):
-			global Sdobavka, flagStartEngineDobavka, flagStopEngineDobavka, R_earth_spitnik, kToplivaLeft, maxW, signVfi, flagStartEngineMoon, flagStopEngineMoon, max_cnt, t, OnOffEngine, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+			global phaseObert, Sdobavka, flagStartEngineDobavka, flagStopEngineDobavka, R_earth_spitnik, kToplivaLeft, maxW, signVfi, flagStartEngineMoon, flagStopEngineMoon, max_cnt, t, OnOffEngine, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
 			t += dt
 
 			#Методом Рунге - Кутты
@@ -138,8 +140,8 @@ class SpaceSystemModelling:
 					dt = 0.01
 
 			# Вывод шага
-			if(i % 500 == 0):
-				print('[step, t, R_earth_spitnik] ', i, t, R_earth_spitnik)
+			# if(i % 500 == 0):
+			# 	print('[step, t, R_earth_spitnik] ', i, t, R_earth_spitnik)
 
 		
 			# Запись данных в файл для анализа
@@ -158,7 +160,9 @@ class SpaceSystemModelling:
 
 					self.moveDataCoordinates['r'].append(np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2))
 
-
+					if(flagStartEngineMoon and not flagStopEngineMoon):
+						phaseObert+=1
+					self.moveDataCoordinates['vklObert'].append(phaseObert)
 
 
 				
@@ -177,6 +181,10 @@ class SpaceSystemModelling:
 				if(R_earth_spitnik > 31.6 and not self.is_load): #
 					self.load_info(name_etude)
 					print('[load] Success')
+					print('[Vfin, shag]', self.moveDataCoordinates['V'][-1], )
+
+
+
 			except BaseException as e:
 				print(f'[load] Error: Ошибка в запоминании данных - {e}')
 
@@ -184,10 +192,9 @@ class SpaceSystemModelling:
 			if(name_etude == 'Маневр по Оберту.json'):
 				# Включаем двигатель против Луны, когда скорость меняет свой знак
 				if(signVfi != (-1 if Vfi < 0 else 1) and t > 70 and not flagStartEngineMoon):
-					print('[oh yes..]')
+					print('[oh yes..] ', cosA)
 					plSystem.get_move_equations(False, True)
 					flagStartEngineMoon = True
-
 
 				# Выключем двигатель против Луны, когда центробежная сила достигает своего максимума
 				#if(maxW > w and t > 81.6 and not flagStopEngineMoon):
@@ -195,8 +202,8 @@ class SpaceSystemModelling:
 					print('[oh no..]')
 					plSystem.get_move_equations(False, False)
 					flagStopEngineMoon = True
-				elif(maxW < w and t > 81.6 and not flagStopEngineMoon):
-					maxW = w
+				# elif(maxW < w and t > 81.6 and not flagStopEngineMoon):
+				# 	maxW = w
 			else:
 				# Добавочная скорость которую можно использовать по Оберту
 				if (t > 89 and not flagStartEngineDobavka):
@@ -212,11 +219,11 @@ class SpaceSystemModelling:
 			# Включение и выключение двигателя по шагу
 			for kk in range(len(OnOffEngine)):
 				if(i > OnOffEngine[kk]['start'] and not OnOffEngine[kk]['is_started']):
-					print('[!] Engine on')
+					# print('[!] Engine on')
 					plSystem.get_move_equations(True, False)
 					OnOffEngine[kk]['is_started'] = True
 				elif (i > OnOffEngine[kk]['stop'] and not OnOffEngine[kk]['is_stoped']):
-					print('[!] Engine off')
+					# print('[!] Engine off')
 					plSystem.get_move_equations(False, False)
 					OnOffEngine[kk]['is_stoped'] = True
 
@@ -227,8 +234,6 @@ class SpaceSystemModelling:
 			elif(flagStartEngineMoon and not flagStopEngineMoon): #or (flagStartEngineDobavka and not flagStopEngineDobavka))
 				kToplivaLeft += dt * w
 			self.K_toplivo_out.setText(str(round(kToplivaLeft, 5)))
-			# print('[kToplivaLeft]', kToplivaLeft)
-
 
 
 			# Изменение расположения объектов и ререндер
@@ -244,8 +249,9 @@ class SpaceSystemModelling:
 				       
 
 
-		global Sdobavka, flagStartEngineDobavka, flagStopEngineDobavka, R_earth_spitnik, name_etude, kToplivaLeft, maxW, signVfi, flagStartEngineMoon, flagStopEngineMoon, max_cnt, t, OnOffEngine, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+		global phaseObert, Sdobavka, flagStartEngineDobavka, flagStopEngineDobavka, R_earth_spitnik, name_etude, kToplivaLeft, maxW, signVfi, flagStartEngineMoon, flagStopEngineMoon, max_cnt, t, OnOffEngine, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
 		
+		phaseObert = 0
 		flagStartEngineDobavka = False
 		flagStopEngineDobavka = False
 		Sdobavka = 0.74798

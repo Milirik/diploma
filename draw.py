@@ -31,14 +31,28 @@ with open(os.path.abspath('.\\data_for_analysis\\' + 'data_for_analysis_Мане
 
 
 
-print('[V final empty]', fileDataEmpty[0]['V'][-1])
-print('[V final without engine]', fileDataWithoutObert[0]['V'][-1])
+
+
+
+
+# print('[V final empty]', fileDataEmpty[0]['V'][-1])
+# print('[V final without engine]', fileDataWithoutObert[0]['V'][-1])
 print('[V final with engine]', fileDataWithObert[0]['V'][-1])
 
+# ax.plot(fileDataEmpty[0]['t'], fileDataEmpty[0]['V'], label='V_empty')
+# ax.plot(fileDataWithoutObert[0]['t'], fileDataWithoutObert[0]['V'], label='V_without_Obert')
+# ax.plot(fileDataWithObert[0]['t'], fileDataWithObert[0]['V'], label='V_with_Obert')
 
-ax.plot(fileDataEmpty[0]['t'], fileDataEmpty[0]['V'], label='V_empty')
-ax.plot(fileDataWithoutObert[0]['t'], fileDataWithoutObert[0]['V'], label='V_without_Obert')
-ax.plot(fileDataWithObert[0]['t'], fileDataWithObert[0]['V'], label='V_with_Obert')
+
+
+# ax.plot(fileDataWithObert[0]['t'], fileDataWithObert[0]['V'], label='V_with_Obert')
+
+# ax.plot(fileDataWithObert[0]['vklObert'], fileDataWithObert[0]['V'], label='V_with_Obert')
+
+
+
+
+
 
 
 # ax.plot(fileData[0]['x'], fileData[0]['y'], marker='o')
@@ -54,12 +68,22 @@ ax.plot(fileDataWithObert[0]['t'], fileDataWithObert[0]['V'], label='V_with_Ober
 # ax.plot(fileData2[0]['t'], fileData2[0]['w'], label='w')
 
 
-
+# ax.plot(fileData[0]['t'], fileData[0]['Vmoon'])
 
 
 # ax.plot(fileData[0]['t'], fileData[0]['Vmoon'])
 # ax.plot(fileData[0]['t'], fileData[0]['r'])
-
+ax.plot(
+	[
+		-1.0, -0.9, -0.8, -0.7, -0.6, -0.5,  -0.4, -0.3, -0.2, -0.1, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0
+	], 
+	[
+		0.4382085677096251, 0.4382085677096251, 0.4382085677096251, 0.4382085677096251, 0.4382085677096251, 0.4382085677096251,
+		0.4474007737929167, 0.4591624747961364, 0.4685513130241974, 0.4743534002940733, 0.4758975076830916, 0.4721177151887614, 
+		0.4614779341291713, 0.4416657177567371, 0.4094633091673678, 0.36200077121897595, 0.30084307759518136, 0.23175058306311605,
+		0.1574854899714972
+	]
+)
 
 ax.legend()
 plt.show()
@@ -67,62 +91,61 @@ plt.show()
 
 
 
-# [r min] 0.08378005118286679 -0.4
-# [V final with engine] 0.4660889441279318
-# [V final without engine] 0.4567847087812945
-
-
-# [r min] 0.08287299240955395 -0.1
-# [V final with engine] 0.49203890886765556
-# [V final without engine] 0.4567847087812945
-
-
-# [r min] 0.08287299240955395 0.0
-# [V final with engine] 0.4935340025409224
-# [V final without engine] 0.4567847087812945
-
-
-# [r min] 0.08287299240955395 0.1
-# [V final with engine] 0.4899043025149786
-# [V final without engine] 0.4567847087812945
-
-
-# [r min] 0.08287299240955395  0.2
-# [V final with engine] 0.4796459730163225
-# [V final without engine] 0.4567847087812945
-
-# [r min] 0.08287299240955395
-# [V final with engine] 0.3848448730141091
-# [V final without engine] 0.4567847087812945
-# [Finished in 8.0s]
-
-# [r min] 0.08287299240955395
-# [V final with engine] 0.49246480724950614
-# [V final without engine] 0.4567847087812945
-# [Finished in 11.0s]
-
-
-
-
-
-
-
-# 0,08239 - расстояние от лунs до спутника должно быть
-
-
-# [V] 0.5220608509310894 : 1.054
-# [r] 0.0845624455340885
-
-
-
-# [V] 0.6413923967505706 : 1.04 
-# [r] 0.033361217785672956
-
-
-# 0.5858107604618253 : 1.045
-# 0.0509448160844163
-
-# 0.50727923676934 : 1.05
-# 0.06942298380023768
-
-
+# shag -  -1.0
+# [load] Success
+# [Vfin, shag] 0.4382085677096251
+# shag -  -0.9
+# [load] Success
+# [Vfin, shag] 0.4382085677096251
+# shag -  -0.8
+# [load] Success
+# [Vfin, shag] 0.4382085677096251
+# shag -  -0.7
+# [load] Success
+# [Vfin, shag] 0.4382085677096251
+# shag -  -0.6
+# [load] Success
+# [Vfin, shag] 0.4382085677096251
+# shag -  -0.5
+# [load] Success
+# [Vfin, shag] 0.4382085677096251
+# shag -  -0.4
+# [load] Success
+# [Vfin, shag] 0.4474007737929167
+# shag -  -0.3
+# [load] Success
+# [Vfin, shag] 0.4591624747961364
+# shag -  -0.2
+# [load] Success
+# [Vfin, shag] 0.4685513130241974
+# shag -  -0.1
+# [load] Success
+# [Vfin, shag] 0.4743534002940733
+# shag -  0.0
+# [load] Success
+# [Vfin, shag] 0.4758975076830916
+# shag -  0.1
+# [load] Success
+# [Vfin, shag] 0.4721177151887614
+# shag -  0.2
+# [load] Success
+# [Vfin, shag] 0.4614779341291713
+# shag -  0.3
+# [load] Success
+# [Vfin, shag] 0.4416657177567371
+# shag -  0.4
+# [load] Success
+# [Vfin, shag] 0.4094633091673678
+# shag -  0.5
+# [load] Success
+# [Vfin, shag] 0.36200077121897595
+# shag -  0.6
+# [load] Success
+# [Vfin, shag] 0.30084307759518136
+# shag -  0.7
+# [load] Success
+# [Vfin, shag] 0.23175058306311605
+# shag -  0.8
+# [load] Success
+# [Vfin, shag] 0.1574854899714972
+# shag -  0.9
