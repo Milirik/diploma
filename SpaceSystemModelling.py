@@ -30,7 +30,7 @@ class SpaceSystemModelling:
 		self.is_load = False
 
 		def NewPoints(i):
-			global signVfi, flagStartEngineMoon, max_cnt, t, OnOffEngine, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+			global kToplivaLeft, maxW, signVfi, flagStartEngineMoon, flagStopEngineMoon, max_cnt, t, OnOffEngine, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
 			t += dt
 
 			if(len(ksi) > 1):
@@ -136,13 +136,14 @@ class SpaceSystemModelling:
 
 			# Вывод шага
 			if(i % 500 == 0):
-				print('[step] ', i)
+				print('[step, t] ', i, t)
 
 			# Запись данных в файл для анализа
 			try:
+				self.moveDataCoordinates['t'].append(t)
 				self.moveDataCoordinates['x'].append(ksi_Sh)
 				self.moveDataCoordinates['y'].append(eta_Sh)
-				self.moveDataCoordinates['t'].append(i)
+				# self.moveDataCoordinates['t'].append(i)
 				self.moveDataCoordinates['V'].append(np.sqrt(Vksi_Sh**2 + Veta_Sh**2))
 				self.moveDataCoordinates['r'].append(np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2))
 
@@ -156,36 +157,54 @@ class SpaceSystemModelling:
 				self.moveDataCoordinates['w'].append(w)
 
 
-				if(i > max_cnt-2 and not self.is_load): #
+				if(i >= max_cnt-1 and not self.is_load): #
 					self.load_info()
 					print('[load] Success')
 			except BaseException as e:
 				print(f'[load] Error: Ошибка в запоминании данных - {e}')
 
-			# Включаем двигатель против Луны
+				
 
-			if(signVfi != (-1 if Vfi < 0 else 1) and i > 8000 and not flagStartEngineMoon):
-				print('hi')
+			# Включаем двигатель против Луны, когда скорость меняет свой знак
+			if(signVfi != (-1 if Vfi < 0 else 1) and t > 70 and not flagStartEngineMoon):
+				print('[oh yes..]')
 				plSystem.get_move_equations(False, True)
 				flagStartEngineMoon = True
-			# не когда равна нулю, а когда меняется знак
+
+			# print('[w]', w, maxW)
+
+			# Выключем двигатель против Луны, когда центробежная сила достигает своего максимума
+			if(maxW > w and t > 81.6 and not flagStopEngineMoon):
+				print('[oh no..]')
+				plSystem.get_move_equations(False, False)
+				flagStopEngineMoon = True
+			elif(maxW < w and t > 81.6 and not flagStopEngineMoon):
+				maxW = w
 
 
 
 			# Включение и выключение двигателя по шагу
-			for t in range(len(OnOffEngine)):
-				if(i > OnOffEngine[t]['start'] and not OnOffEngine[t]['is_started']):
+			for kk in range(len(OnOffEngine)):
+				if(i > OnOffEngine[kk]['start'] and not OnOffEngine[kk]['is_started']):
 					print('[!] Engine on')
 					plSystem.get_move_equations(True, False)
-					OnOffEngine[t]['is_started'] = True
-				elif (i > OnOffEngine[t]['stop'] and not OnOffEngine[t]['is_stoped']):
+					OnOffEngine[kk]['is_started'] = True
+				elif (i > OnOffEngine[kk]['stop'] and not OnOffEngine[kk]['is_stoped']):
 					print('[!] Engine off')
 					plSystem.get_move_equations(False, False)
-					OnOffEngine[t]['is_stoped'] = True
+					OnOffEngine[kk]['is_stoped'] = True
+
 
 			# Отображение потраченного топлива
 			if(i <= int(K_stop_engine)):
-			    self.K_toplivo_out.setText(str(int(i*F_dv)))
+				kToplivaLeft += dt * F_dv
+			elif(flagStartEngineMoon and not flagStopEngineMoon):
+				kToplivaLeft += dt * w
+
+			self.K_toplivo_out.setText(str(int(kToplivaLeft)))
+			print('[kToplivaLeft]', kToplivaLeft)
+
+
 
 			# Изменение расположения объектов и ререндер
 			if(is_draw_only_trajectory):
@@ -200,10 +219,13 @@ class SpaceSystemModelling:
 				       
 
 
-		global signVfi, flagStartEngineMoon, max_cnt, t, OnOffEngine, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+		global kToplivaLeft, maxW, signVfi, flagStartEngineMoon, flagStopEngineMoon, max_cnt, t, OnOffEngine, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+		kToplivaLeft = 0
 		signVfi = 1
 
 		flagStartEngineMoon = False
+		flagStopEngineMoon = False
+		maxW = 0
 		t = 0
 		F_dv = 0
 		Alpha = 0

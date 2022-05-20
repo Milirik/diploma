@@ -120,15 +120,17 @@ class PlanetSystem():
                 Fx_dv_vs_Earth = F_dv * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила x двигателя направленная против земли
                 Fy_dv_vs_Earth = F_dv * VETA_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))  # Сила y двигателя направленная против земли
             elif(is_near_moon):
+
                 r = [KSI_Sh - KSI[1], ETA_Sh - ETA[1]]
+                print('[r] ', r)
                 Vfi = (VKSI_Sh * r[1] - VETA_Sh * r[0]) / sp.sqrt(r[0]**2 + r[1]**2)
                 F = Vfi**2/sp.sqrt(r[0]**2 + r[1]**2)
 
                 Fx_dv_vs_Earth = 0
                 Fy_dv_vs_Earth = 0
-                Fx_dv_vs_Moon = F * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))
-                Fy_dv_vs_Moon = F * VKSI_Sh /(sp.sqrt(VKSI_Sh**2 + VETA_Sh**2))
-                print('[x] Fx_dv_vs_Moon', Fx_dv_vs_Moon)
+                Fx_dv_vs_Moon = F * (-r[0])
+                Fy_dv_vs_Moon = F * (-r[1])
+
             else:
                 Fx_dv_vs_Earth = 0
                 Fy_dv_vs_Earth = 0
@@ -136,8 +138,11 @@ class PlanetSystem():
                 Fy_dv_vs_Moon = 0
                 
 
-            print(f'[!] Fx_dv_vs_Earth', Fx_dv_vs_Earth)
-            print(f'[!] Fy_dv_vs_Earth', Fy_dv_vs_Earth)
+            print(f'[Fx_dv_vs_Earth] ', Fx_dv_vs_Earth)
+            print(f'[Fy_dv_vs_Earth] ', Fy_dv_vs_Earth)
+            print(f'[Fx_dv_vs_Moon] ', Fx_dv_vs_Moon)
+            print(f'[Fy_dv_vs_Moon] ', Fy_dv_vs_Moon)
+
 
 
             DVKSI_Sh = sum([
