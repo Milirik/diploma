@@ -8,10 +8,11 @@ class SpaceSystemModelling:
 	def __init__(self):
 		pass
 
-	def load_info(self):
+	def load_info(self, name_etude):
 		self.is_load = True
-		name_value = f'DataForAnalysis'
-		with open(f"./data_for_analysis/{name_value}.json", "w") as write_file:
+		name_value = f'data_for_analysis'
+		name_etude_ = name_etude.replace(" ", "_")
+		with open(f"./data_for_analysis/{name_value}_{name_etude_}", "w") as write_file:
 			json.dump([self.moveDataCoordinates], write_file)
 
 
@@ -21,24 +22,19 @@ class SpaceSystemModelling:
 			'y': [],
 			't': [],
 			'V': [],
+			'cosA': [],
 			'r': [],
 			'Vr': [],
 			'Vfi': [],
-			'w': []
+			'w': [],
+			'R_earth_spitnik': []
 		}
 
 		self.is_load = False
 
 		def NewPoints(i):
-			global kToplivaLeft, maxW, signVfi, flagStartEngineMoon, flagStopEngineMoon, max_cnt, t, OnOffEngine, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+			global Sdobavka, flagStartEngineDobavka, flagStopEngineDobavka, R_earth_spitnik, kToplivaLeft, maxW, signVfi, flagStartEngineMoon, flagStopEngineMoon, max_cnt, t, OnOffEngine, dt, Side, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
 			t += dt
-
-			if(len(ksi) > 1):
-				rast = np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2 +(zeta_Sh - zeta[1])**2)
-				if(rast < 1):
-					dt = 0.001
-				else:
-					dt = 0.01
 
 			#Методом Рунге - Кутты
 			Dksi1, Deta1,Dzeta1, DVksi1, DVeta1,DVzeta1 = plSystem.SpaceBodyMoveEquations(ksi, eta, zeta, Vksi, Veta,Vzeta)
@@ -133,54 +129,84 @@ class SpaceSystemModelling:
 			Veta_Sh = Veta_Sh + dt / 6 * (DVeta1_Sh + 2 * DVeta2_Sh + 2 * DVeta3_Sh + DVeta4_Sh)
 			Vzeta_Sh = Vzeta_Sh + dt / 6 * (DVzeta1_Sh + 2 * DVzeta2_Sh + 2 * DVzeta3_Sh + DVzeta4_Sh)
 
+			# Увеличиваем шаг интегрирования при приближении к Луне
+			if(len(ksi) > 1):
+				rast = np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2 +(zeta_Sh - zeta[1])**2)
+				if(rast < 1):
+					dt = 0.001
+				else:
+					dt = 0.01
 
 			# Вывод шага
 			if(i % 500 == 0):
-				print('[step, t] ', i, t)
+				print('[step, t, R_earth_spitnik] ', i, t, R_earth_spitnik)
 
+		
 			# Запись данных в файл для анализа
 			try:
+				if(name_etude == 'Маневр по Оберту.json'):
+					r = [ksi_Sh - ksi[1], eta_Sh - eta[1]]
+					Vr = (Vksi_Sh * r[0] + Veta_Sh * r[1]) / np.sqrt(r[0]**2 + r[1]**2)
+					Vfi = (Vksi_Sh * r[1] - Veta_Sh * r[0]) / np.sqrt(r[0]**2 + r[1]**2)
+					w = (Vfi**2)/np.sqrt(r[0]**2 + r[1]**2)
+					cosA = (Vksi_Sh * Vksi[1] + Veta_Sh * Veta[1])/(np.sqrt(Vksi_Sh**2 + Veta_Sh **2)*np.sqrt(Vksi[1]**2 + Veta[1] **2))
+					
+					self.moveDataCoordinates['cosA'].append(cosA)
+					self.moveDataCoordinates['Vr'].append(Vr)
+					self.moveDataCoordinates['Vfi'].append(Vfi)
+					self.moveDataCoordinates['w'].append(w)
+
+					self.moveDataCoordinates['r'].append(np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2))
+
+
+
+
+				
+				R_earth_spitnik = np.sqrt((ksi_Sh - ksi[0])**2 + (eta_Sh - eta[0])**2)
+				self.moveDataCoordinates['R_earth_spitnik'].append(R_earth_spitnik)
+
+
+
 				self.moveDataCoordinates['t'].append(t)
 				self.moveDataCoordinates['x'].append(ksi_Sh)
 				self.moveDataCoordinates['y'].append(eta_Sh)
-				# self.moveDataCoordinates['t'].append(i)
 				self.moveDataCoordinates['V'].append(np.sqrt(Vksi_Sh**2 + Veta_Sh**2))
-				self.moveDataCoordinates['r'].append(np.sqrt((ksi_Sh - ksi[1])**2 + (eta_Sh - eta[1])**2))
-
-				r = [ksi_Sh - ksi[1], eta_Sh - eta[1]]
-				Vr = (Vksi_Sh * r[0] + Veta_Sh * r[1]) / np.sqrt(r[0]**2 + r[1]**2)
-				Vfi = (Vksi_Sh * r[1] - Veta_Sh * r[0]) / np.sqrt(r[0]**2 + r[1]**2)
-				w = (Vfi**2)/np.sqrt(r[0]**2 + r[1]**2)
-
-				self.moveDataCoordinates['Vr'].append(Vr)
-				self.moveDataCoordinates['Vfi'].append(Vfi)
-				self.moveDataCoordinates['w'].append(w)
 
 
-				if(i >= max_cnt-1 and not self.is_load): #
-					self.load_info()
+
+				if(R_earth_spitnik > 31.6 and not self.is_load): #
+					self.load_info(name_etude)
 					print('[load] Success')
 			except BaseException as e:
 				print(f'[load] Error: Ошибка в запоминании данных - {e}')
 
-				
+			# Работа двигателя, если использован метод Оберта
+			if(name_etude == 'Маневр по Оберту.json'):
+				# Включаем двигатель против Луны, когда скорость меняет свой знак
+				if(signVfi != (-1 if Vfi < 0 else 1) and t > 70 and not flagStartEngineMoon):
+					print('[oh yes..]')
+					plSystem.get_move_equations(False, True)
+					flagStartEngineMoon = True
 
-			# Включаем двигатель против Луны, когда скорость меняет свой знак
-			if(signVfi != (-1 if Vfi < 0 else 1) and t > 70 and not flagStartEngineMoon):
-				print('[oh yes..]')
-				plSystem.get_move_equations(False, True)
-				flagStartEngineMoon = True
 
-			# print('[w]', w, maxW)
-
-			# Выключем двигатель против Луны, когда центробежная сила достигает своего максимума
-			if(maxW > w and t > 81.6 and not flagStopEngineMoon):
-				print('[oh no..]')
-				plSystem.get_move_equations(False, False)
-				flagStopEngineMoon = True
-			elif(maxW < w and t > 81.6 and not flagStopEngineMoon):
-				maxW = w
-
+				# Выключем двигатель против Луны, когда центробежная сила достигает своего максимума
+				#if(maxW > w and t > 81.6 and not flagStopEngineMoon):
+				if(round(cosA, 3) > 0.0 and t > 81.6 and not flagStopEngineMoon):
+					print('[oh no..]')
+					plSystem.get_move_equations(False, False)
+					flagStopEngineMoon = True
+				elif(maxW < w and t > 81.6 and not flagStopEngineMoon):
+					maxW = w
+			else:
+				# Добавочная скорость которую можно использовать по Оберту
+				if (t > 89 and not flagStartEngineDobavka):
+					plSystem.get_move_equations(False, False, True, Sdobavka)
+					kToplivaLeft += Sdobavka
+					flagStartEngineDobavka = True
+				elif(kToplivaLeft >= Sdobavka and t > 89 and not flagStopEngineDobavka):
+					plSystem.get_move_equations(False, False, False, 0)
+					flagStopEngineDobavka = True
+			# print('[x]', kToplivaLeft, Sdobavka)
 
 
 			# Включение и выключение двигателя по шагу
@@ -198,11 +224,10 @@ class SpaceSystemModelling:
 			# Отображение потраченного топлива
 			if(i <= int(K_stop_engine)):
 				kToplivaLeft += dt * F_dv
-			elif(flagStartEngineMoon and not flagStopEngineMoon):
+			elif(flagStartEngineMoon and not flagStopEngineMoon): #or (flagStartEngineDobavka and not flagStopEngineDobavka))
 				kToplivaLeft += dt * w
-
-			self.K_toplivo_out.setText(str(int(kToplivaLeft)))
-			print('[kToplivaLeft]', kToplivaLeft)
+			self.K_toplivo_out.setText(str(round(kToplivaLeft, 5)))
+			# print('[kToplivaLeft]', kToplivaLeft)
 
 
 
@@ -219,10 +244,15 @@ class SpaceSystemModelling:
 				       
 
 
-		global kToplivaLeft, maxW, signVfi, flagStartEngineMoon, flagStopEngineMoon, max_cnt, t, OnOffEngine, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+		global Sdobavka, flagStartEngineDobavka, flagStopEngineDobavka, R_earth_spitnik, name_etude, kToplivaLeft, maxW, signVfi, flagStartEngineMoon, flagStopEngineMoon, max_cnt, t, OnOffEngine, Side, dt, plSystem, ksi, eta, zeta, Vksi, Veta, Vzeta, Dksi, Deta, Dzeta, DVksi, DVeta, DVzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, Dksi_Sh, Deta_Sh, Dzeta_Sh, DVksi_Sh, DVeta_Sh, DVzeta_Sh, F_dv, Alpha, Beta, K_stop_engine
+		
+		flagStartEngineDobavka = False
+		flagStopEngineDobavka = False
+		Sdobavka = 0.74798
+
+		R_earth_spitnik = 0
 		kToplivaLeft = 0
 		signVfi = 1
-
 		flagStartEngineMoon = False
 		flagStopEngineMoon = False
 		maxW = 0
@@ -231,14 +261,16 @@ class SpaceSystemModelling:
 		Alpha = 0
 		Beta = 0
 
-		#     Параметры массы
+		# Параметры системы
 		dt = float(self.TStep_field.text()) # Шаг интегрирования
 		phi = float(self.moonPhi.text()) # Фаза для Луны
 		max_cnt = int(self.K_step_model.text()) # Кол-во шагов интегрирования
-
+		name_etude = self.chosenEtudeLabel.text() # Название этюда
 		
+
 		razm = 4.216424392e7 # Для обезразмеривания
 		koff = 7.29e-5 # Для обезразмеривания
+
 
 		plSystem = PlanetSystem([])
 		for i in self.fileData:
@@ -304,7 +336,7 @@ class SpaceSystemModelling:
 
 			dt = 0.01
 			cnt = 0
-			while cnt != max_cnt:
+			while R_earth_spitnik <= 31.6: # cnt != max_cnt
 			    NewPoints(cnt)
 			    cnt+=1
 			    self.progressBarDrawingSpTr.setValue(cnt*100/max_cnt) 
