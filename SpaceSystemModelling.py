@@ -2,6 +2,7 @@ from Models import PlanetSystem, Planet, SpaceShip
 import numpy as np
 from matplotlib.animation import FuncAnimation
 import json
+import math
 
 
 class SpaceSystemModelling:
@@ -29,7 +30,9 @@ class SpaceSystemModelling:
 			'Vfi': [],
 			'w': [],
 			'R_earth_spitnik': [],
-			'vklObert': []
+			'vklObert': [],
+			'V_sh * Vmoon': [],
+			'Угол между финальной скоростью и расстоянием на Землю': []
 		}
 
 		self.is_load = False
@@ -140,8 +143,8 @@ class SpaceSystemModelling:
 					dt = 0.01
 
 			# Вывод шага
-			# if(i % 500 == 0):
-			# 	print('[step, t, R_earth_spitnik] ', i, t, R_earth_spitnik)
+			if(i % 500 == 0):
+				print('[step, t, R_earth_spitnik] ', i, t, R_earth_spitnik)
 
 		
 			# Запись данных в файл для анализа
@@ -164,6 +167,13 @@ class SpaceSystemModelling:
 						phaseObert+=1
 					self.moveDataCoordinates['vklObert'].append(phaseObert)
 
+					V_sh__Vmoon = np.sqrt(Vksi_Sh**2 + Vksi[1]**2) * np.sqrt(Veta_Sh**2 + Veta[1]**2) * cosA
+					self.moveDataCoordinates['V_sh * Vmoon'].append(V_sh__Vmoon)
+
+					V_fin__Rearth = math.atan2(ksi_Sh - ksi[0], eta_Sh - eta[0]) - math.atan2(Vksi_Sh, Veta_Sh)
+					self.moveDataCoordinates['Угол между финальной скоростью и расстоянием на Землю'].append(V_fin__Rearth)
+
+
 
 				
 				R_earth_spitnik = np.sqrt((ksi_Sh - ksi[0])**2 + (eta_Sh - eta[0])**2)
@@ -181,12 +191,12 @@ class SpaceSystemModelling:
 				if(R_earth_spitnik > 31.6 and not self.is_load): #
 					self.load_info(name_etude)
 					print('[load] Success')
-					print('[Vfin, shag]', self.moveDataCoordinates['V'][-1], )
-
-
+					print('[V_fin__Rearth, cosA]', V_fin__Rearth, cosA)
 
 			except BaseException as e:
 				print(f'[load] Error: Ошибка в запоминании данных - {e}')
+
+
 
 			# Работа двигателя, если использован метод Оберта
 			if(name_etude == 'Маневр по Оберту.json'):
@@ -198,10 +208,11 @@ class SpaceSystemModelling:
 
 				# Выключем двигатель против Луны, когда центробежная сила достигает своего максимума
 				#if(maxW > w and t > 81.6 and not flagStopEngineMoon):
-				if(round(cosA, 3) > 0.0 and t > 81.6 and not flagStopEngineMoon):
+				if(round(cosA, 3) > shag and t > 81.6 and not flagStopEngineMoon):
 					print('[oh no..]')
 					plSystem.get_move_equations(False, False)
 					flagStopEngineMoon = True
+					# print('[V_sh__Vmoon t]', V_sh__Vmoon, t)
 				# elif(maxW < w and t > 81.6 and not flagStopEngineMoon):
 				# 	maxW = w
 			else:
@@ -213,17 +224,14 @@ class SpaceSystemModelling:
 				elif(kToplivaLeft >= Sdobavka and t > 89 and not flagStopEngineDobavka):
 					plSystem.get_move_equations(False, False, False, 0)
 					flagStopEngineDobavka = True
-			# print('[x]', kToplivaLeft, Sdobavka)
 
 
 			# Включение и выключение двигателя по шагу
 			for kk in range(len(OnOffEngine)):
 				if(i > OnOffEngine[kk]['start'] and not OnOffEngine[kk]['is_started']):
-					# print('[!] Engine on')
 					plSystem.get_move_equations(True, False)
 					OnOffEngine[kk]['is_started'] = True
 				elif (i > OnOffEngine[kk]['stop'] and not OnOffEngine[kk]['is_stoped']):
-					# print('[!] Engine off')
 					plSystem.get_move_equations(False, False)
 					OnOffEngine[kk]['is_stoped'] = True
 
@@ -293,13 +301,16 @@ class SpaceSystemModelling:
 		        else:
 		        	# Key
 		        	ki = 0.01232376679 # Для обезразмеривания
-		        	ksi_1 = ksi_ * np.cos(phi) - eta_ * np.sin(phi)
-		        	eta_1 = ksi_ * np.sin(phi) + eta_ * np.cos(phi)
 
-		        	V_ksi1 = V_ksi * np.cos(phi) - V_eta * np.sin(phi)
-		        	V_eta1 = V_ksi * np.sin(phi) + V_eta * np.cos(phi)
+		        	if(name_etude not in ('Уход с орбиты.json')):
+			        	# Меняем фазу Луны
+			        	ksi_1 = ksi_ * np.cos(phi) - eta_ * np.sin(phi)
+			        	eta_1 = ksi_ * np.sin(phi) + eta_ * np.cos(phi)
 
-		        	ksi_, eta_, V_ksi, V_eta = ksi_1, eta_1, V_ksi1, V_eta1
+			        	V_ksi1 = V_ksi * np.cos(phi) - V_eta * np.sin(phi)
+			        	V_eta1 = V_ksi * np.sin(phi) + V_eta * np.cos(phi)
+
+			        	ksi_, eta_, V_ksi, V_eta = ksi_1, eta_1, V_ksi1, V_eta1
 
 
 		        

@@ -140,10 +140,10 @@ class PlanetSystem():
                 Fy_dv_vs_Moon = 0
                 
 
-            # print(f'[Fx_dv_vs_Earth] ', Fx_dv_vs_Earth)
-            # print(f'[Fy_dv_vs_Earth] ', Fy_dv_vs_Earth)
-            # print(f'[Fx_dv_vs_Moon] ', Fx_dv_vs_Moon)
-            # print(f'[Fy_dv_vs_Moon] ', Fy_dv_vs_Moon)
+            print(f'[Fx_dv_vs_Earth] ', Fx_dv_vs_Earth)
+            print(f'[Fy_dv_vs_Earth] ', Fy_dv_vs_Earth)
+            print(f'[Fx_dv_vs_Moon] ', Fx_dv_vs_Moon)
+            print(f'[Fy_dv_vs_Moon] ', Fy_dv_vs_Moon)
 
 
 
