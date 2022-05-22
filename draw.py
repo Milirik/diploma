@@ -39,9 +39,9 @@ print('[V final empty]', fileDataEmpty[0]['V'][-1])
 print('[V final without engine]', fileDataWithoutObert[0]['V'][-1])
 print('[V final with engine]', fileDataWithObert[0]['V'][-1])
 
-ax.plot(fileDataEmpty[0]['t'], fileDataEmpty[0]['V'], label='V_empty')
-ax.plot(fileDataWithoutObert[0]['t'], fileDataWithoutObert[0]['V'], label='V_without_Obert')
-ax.plot(fileDataWithObert[0]['t'], fileDataWithObert[0]['V'], label='V_with_Obert')
+# ax.plot(fileDataEmpty[0]['t'], fileDataEmpty[0]['V'], label='V_empty')
+# ax.plot(fileDataWithoutObert[0]['t'], fileDataWithoutObert[0]['V'], label='V_without_Obert')
+# ax.plot(fileDataWithObert[0]['t'], fileDataWithObert[0]['V'], label='V_with_Obert')
 
 
 
@@ -94,19 +94,19 @@ ax.plot(fileDataWithObert[0]['t'], fileDataWithObert[0]['V'], label='V_with_Ober
 
 
 
-# ax.plot(fileData[0]['t'], fileData[0]['Vmoon'])
-# ax.plot(fileData[0]['t'], fileData[0]['r'])
-# ax.plot(
-# 	[
-# 		-1.0, -0.9, -0.8, -0.7, -0.6, -0.5,  -0.4, -0.3, -0.2, -0.1, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0
-# 	], 
-# 	[
-# 		0.4382085677096251, 0.4382085677096251, 0.4382085677096251, 0.4382085677096251, 0.4382085677096251, 0.4382085677096251,
-# 		0.4474007737929167, 0.4591624747961364, 0.4685513130241974, 0.4743534002940733, 0.4758975076830916, 0.4721177151887614, 
-# 		0.4614779341291713, 0.4416657177567371, 0.4094633091673678, 0.36200077121897595, 0.30084307759518136, 0.23175058306311605,
-# 		0.1574854899714972
-# 	]
-# )
+# ax.plot(fileDataWithObert[0]['t'], fileDataWithObert[0]['Vmoon'])
+# ax.plot(fileDataWithObert[0]['t'], fileDataWithObert[0]['r'])
+ax.plot(
+	[
+		-1.0, -0.9, -0.8, -0.7, -0.6, -0.5,  -0.4, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8
+	], 
+	[
+		0.4382085677096251, 0.4382085677096251, 0.4382085677096251, 0.4382085677096251, 0.4382085677096251, 0.4382085677096251,
+		0.4474007737929167, 0.4591624747961364, 0.4685513130241974, 0.4743534002940733, 0.4758975076830916, 0.4721177151887614, 
+		0.4614779341291713, 0.4416657177567371, 0.4094633091673678, 0.36200077121897595, 0.30084307759518136, 0.23175058306311605,
+		0.1574854899714972
+	]
+)
 
 ax.legend()
 plt.show()
