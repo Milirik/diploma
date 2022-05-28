@@ -313,10 +313,9 @@ class SpaceSystemModelling:
 			        	ksi_, eta_, V_ksi, V_eta = ksi_1, eta_1, V_ksi1, V_eta1
 
 
-		        
-
-
 		        plSystem.add_new_planet(Planet(ksi_, eta_, zeta_, V_ksi, V_eta, V_zeta, ki, M, R, color))
+		        print(f'{ksi_} {eta_} {V_ksi} {V_eta} {ki} {R}')
+
 		    else:
 		        ksi_, eta_, zeta_ = [i["x"] / razm, i["y"] / razm, i["z"] / razm]
 		        V_ksi, V_eta, V_zeta = [i["Vx"]  / (koff * razm), i["Vy"]  / (koff * razm), i["Vz"]  / (koff * razm)]
@@ -324,6 +323,9 @@ class SpaceSystemModelling:
 		        M = i["m"]
 		        F_dv =  i["F_dv"]
 		        K_stop_engine_ = i["K_stop_engine"]
+
+		        print(f'{ksi_} {eta_} {V_ksi} {V_eta} {ki} {R}')
+
 
 		        plSystem.add_spaceship(SpaceShip(ksi_, eta_, zeta_, V_ksi, V_eta, V_zeta, M, R, color, F_dv, K_stop_engine_))
 
