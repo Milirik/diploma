@@ -396,23 +396,8 @@ class SpaceSystemModelling:
 			TraceETA_2.extend(plSystem.spaceShip.TraceETA[OnOffEngine[0]['stop']:])
 			TraceZETA_2.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[0]['stop']:])
 
-			# TraceKSI_m.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[1]['start']:OnOffEngine[1]['stop']])
-			# TraceETA_m.extend(plSystem.spaceShip.TraceETA[OnOffEngine[1]['start']:OnOffEngine[1]['stop']])
-			# TraceZETA_m.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[1]['start']:OnOffEngine[1]['stop']])
-
-			# TraceKSI_2.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[0]['stop']:OnOffEngine[1]['start']])
-			# TraceETA_2.extend(plSystem.spaceShip.TraceETA[OnOffEngine[0]['stop']:OnOffEngine[1]['start']])
-			# TraceZETA_2.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[0]['stop']:OnOffEngine[1]['start']])
-
-			# TraceKSI_2m.extend(plSystem.spaceShip.TraceKSI[OnOffEngine[1]['stop']:])
-			# TraceETA_2m.extend(plSystem.spaceShip.TraceETA[OnOffEngine[1]['stop']:])
-			# TraceZETA_2m.extend(plSystem.spaceShip.TraceZETA[OnOffEngine[1]['stop']:])
-
 			self.SpWidget.canvas.axes.plot(TraceKSI_, TraceETA_, TraceZETA_, ':', color='red')
 			self.SpWidget.canvas.axes.plot(TraceKSI_2, TraceETA_2, TraceZETA_2, ':', color='blue')
-
-			# self.SpWidget.canvas.axes.plot(TraceKSI_m, TraceETA_m, TraceZETA_m, ':', color='red')
-			# self.SpWidget.canvas.axes.plot(TraceKSI_2m, TraceETA_2m, TraceZETA_2m, ':', color='blue')
 
 		else:
 			plSystem.draw(self.SpWidget.canvas.axes)
