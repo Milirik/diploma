@@ -282,7 +282,7 @@ class SpaceShip():
 
     def draw(self, axes):
         self.DrawedSpaceShip = axes.plot(self.ksi, self.eta, self.zeta,marker='o',markersize=1, color=self.color)[0]
-        self.DrawedSpaceShipFlame = axes.plot(self.ksi, self.eta, self.zeta, color='orange')[0]
+        # self.DrawedSpaceShipFlame = axes.plot(self.ksi, self.eta, self.zeta, color='orange')[0]
         
         self.DrawedTraceEngineOn = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='red')[0]
         self.DrawedTraceEngineOff = axes.plot(self.TraceKSI, self.TraceETA, self.TraceZETA, ':', color='blue')[0]
@@ -323,7 +323,7 @@ class SpaceShip():
 
         Fx_dv_vs_Earth = self.F_dv * self.Vksi /(sp.sqrt(self.Vksi**2 + self.Veta**2))  # Сила x двигателя направленная против земли
         Fy_dv_vs_Earth = self.F_dv * self.Veta /(sp.sqrt(self.Vksi**2 + self.Veta**2))  # Сила y двигателя направленная против земли
-        self.DrawedSpaceShipFlame.set_data_3d(np.array([self.ksi, self.ksi + Fx_dv_vs_Earth * 100]), np.array([self.eta, self.eta + Fy_dv_vs_Earth * 100]), self.zeta)
+        # self.DrawedSpaceShipFlame.set_data_3d(np.array([self.ksi, self.ksi + Fx_dv_vs_Earth * 100]), np.array([self.eta, self.eta + Fy_dv_vs_Earth * 100]), self.zeta)
 
 
 def draw_the_space(axes):

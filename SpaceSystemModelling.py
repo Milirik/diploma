@@ -251,7 +251,8 @@ class SpaceSystemModelling:
 				plSystem.replace_system(ksi, eta, zeta, Vksi, Veta, Vzeta, ksi_Sh, eta_Sh, zeta_Sh, Vksi_Sh, Veta_Sh, Vzeta_Sh, i, OnOffEngine)
 				drPlanets = [planet.DrawedPlanet for planet in plSystem.planets]
 				drTraces = [planet.DrawedTrace for planet in plSystem.planets]
-				return [plSystem.spaceShip.DrawedSpaceShip] + drTraces + drPlanets + [plSystem.spaceShip.DrawedTraceEngineOn] + [plSystem.spaceShip.DrawedTraceEngineOff] + [plSystem.spaceShip.DrawedSpaceShipFlame]
+				return [plSystem.spaceShip.DrawedSpaceShip] + drTraces + drPlanets + [plSystem.spaceShip.DrawedTraceEngineOn] + [plSystem.spaceShip.DrawedTraceEngineOff]
+				 # + [plSystem.spaceShip.DrawedSpaceShipFlame]
 				# + [plSystem.spaceShip.DrawedTraceAfterMoon] + 
 				# + [plSystem.spaceShip.DrawedTrace] + \
 				       
