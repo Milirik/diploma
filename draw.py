@@ -39,9 +39,11 @@ print('[V final empty]', fileDataEmpty[0]['V'][-1])
 print('[V final without engine]', fileDataWithoutObert[0]['V'][-1])
 print('[V final with engine]', fileDataWithObert[0]['V'][-1])
 
-ax.plot(fileDataEmpty[0]['t'], fileDataEmpty[0]['V'], label='V_empty')
-ax.plot(fileDataWithoutObert[0]['t'], fileDataWithoutObert[0]['V'], label='V_without_Obert')
-ax.plot(fileDataWithObert[0]['t'], fileDataWithObert[0]['V'], label='V_with_Obert')
+# ax.plot(fileDataEmpty[0]['t'], fileDataEmpty[0]['V'], label='V_empty')
+# ax.plot(fileDataWithoutObert[0]['t'], fileDataWithoutObert[0]['V'], label='V_without_Obert')
+ax.plot(fileDataWithoutObert[0]['t'][8000:13000], fileDataWithoutObert[0]['V'][8000:13000], label='V_without_Obert')
+
+# ax.plot(fileDataWithObert[0]['t'], fileDataWithObert[0]['V'], label='V_with_Obert')
 
 
 
